@@ -11,6 +11,15 @@ PALABRAS_RESERVADAS (program)|(begin)|(uses)|(unit)|(interface)|(implementation)
 
 SIMBOLOS_ESCRITURA \@|\#|\<\>|\<\=|\>\=|\+|\-|\*|\/|\<|\>|\^|\;|\=|\,|\(|\)|\[|\]|\:|\:\=|\.\.
 
+DIGITOS [0-9]+
+DIGITOS_HEX [0-9a-fA-F]+
+SIGNO \+|\-
+FACTOR [eE]{SIGNO}?{DIGITOS}
+ENTERO_SIN_SIGNO {DIGITOS}|${DIGITOS_HEX}
+REAL_SIN_SIGNO {DIGITOS}(.{DIGITOS}|{FACTOR})
+NUMERO_SIN_SIGNO {ENTERO_SIN_SIGNO}|{REAL_SIN_SIGNO}
+NUMERO_CON_SIGNO {SIGNO}?{NUMERO_SIN_SIGNO}
+
 %x comentario
 
 %option noyywrap
@@ -34,6 +43,10 @@ SIMBOLOS_ESCRITURA \@|\#|\<\>|\<\=|\>\=|\+|\-|\*|\/|\<|\>|\^|\;|\=|\,|\(|\)|\[|\
 
 {SIMBOLOS_ESCRITURA} {
   printf("ES UN SIMBOLO DE ESCRITURA %s \n", yytext);
+}
+
+{NUMERO_CON_SIGNO} {
+  printf("ES UN NUMERO %s \n", yytext);
 }
 
 . {
