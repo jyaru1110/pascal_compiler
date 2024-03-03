@@ -1,6 +1,12 @@
 
 %{ 
 #include <stdio.h>
+#include <iostream>
+#include <unordered_map> 
+#include <string>
+using namespace std;
+unordered_map<string, int> simbolos;
+unordered_map<string, int> numeros;
 %}
 
 INCIO_COMENTARIO \{|(\(\*)
@@ -42,11 +48,31 @@ NUMERO_CON_SIGNO {SIGNO}?{NUMERO_SIN_SIGNO}
 }
 
 {SIMBOLOS_ESCRITURA} {
-  printf("ES UN SIMBOLO DE ESCRITURA %s \n", yytext);
+  if (simbolos.find(yytext) == simbolos.end()){
+    simbolos[yytext] = 1;
+  }
+  else{
+    simbolos[yytext]++;
+  }
 }
 
 {NUMERO_CON_SIGNO} {
-  printf("ES UN NUMERO %s \n", yytext);
+  if (numeros.find(yytext) == numeros.end()){
+    numeros[yytext] = 1;
+  }
+  else{
+    numeros[yytext]++;
+  }
+}
+
+imprimir {
+  cout << "maps" << endl;
+  for (auto& it: simbolos) {
+      cout << it.first << " " << it.second << endl;
+  }
+  for (auto& it: numeros) {
+      cout << it.first << " " << it.second << endl;
+  }
 }
 
 . {
