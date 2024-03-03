@@ -8,6 +8,9 @@ FIN_COMENTARIO \}|(\*\))
 PALABRA [a-zA-Z0-9:; ]+
 
 PALABRAS_RESERVADAS (program)|(begin)|(uses)|(unit)|(interface)|(implementation)|(label)|(const)|(type)|(real)|(integer)|(longint)|(word)|(char)|(boolean)|(true)|(false)|(string)|(packed)|(array)|(record)|(end)|(case)|(otherwise)|(of)|(set)|(var)|(forward)|(external)|(function)|(procedure)|(file)|(goto)|(if)|(then)|(else)|(repeat)|(until)|(while)|(do)|(for)|(to)|(downto)|(with)|(nil)|(read)|(readln)|(write)|(writeln)|(in)|(or)|(div)|(mod)|(and)|(not)
+
+SIMBOLOS_ESCRITURA @ | # | <> | <= | >= | + | - | \* | \/ | < | > | \^ | ; | = | , | \( | \) | \[ | \] | : | := | ..
+
 %x comentario
 
 %option noyywrap
@@ -27,6 +30,10 @@ PALABRAS_RESERVADAS (program)|(begin)|(uses)|(unit)|(interface)|(implementation)
 
 {PALABRAS_RESERVADAS} {
 	printf("ES PALABRA RESERVADA %s \n", yytext); 
+}
+
+{SIMBOLOS_ESCRITURA} {
+  printf("ES UN SIMBOLO DE ESCRITURA %s \n", yytext);
 }
 
 . {
