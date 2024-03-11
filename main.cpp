@@ -367,62 +367,62 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[505] =
     {   0,
-        0,    0,    0,    0,   14,   12,    3,    2,    5,   12,
+        0,    0,    0,    0,   14,   12,    4,    3,    2,    2,
         9,   12,   12,    9,    9,   12,   10,    9,    9,    9,
-        4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
-        4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
-        6,    8,    3,    2,    5,    8,    8,    8,    8,    8,
-        8,    8,    8,    8,    8,    8,    8,    4,    4,    4,
-        4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
-        4,    4,    4,    4,    4,    4,    4,    6,    7,    0,
-       10,    0,    6,    0,   10,    9,    0,   10,    0,    4,
-        4,    4,    4,    4,    4,    4,    4,    4,    1,    4,
+        5,    5,    5,    5,    5,    5,    5,    5,    5,    5,
+        5,    5,    5,    5,    5,    5,    5,    5,    5,    5,
+        6,    8,    4,    3,    2,    2,    8,    8,    8,    8,
+        8,    8,    8,    8,    8,    8,    8,    5,    5,    5,
+        5,    5,    5,    5,    5,    5,    5,    5,    5,    5,
+        5,    5,    5,    5,    5,    5,    5,    6,    7,    0,
+       10,    0,    6,    0,   10,    9,    0,   10,    0,    5,
+        5,    5,    5,    5,    5,    5,    5,    5,    1,    5,
 
-        4,    4,    4,    4,    4,    4,    4,    1,    4,    1,
-        4,    4,    4,    4,    4,    1,    1,    4,    4,    4,
-        4,    4,    4,    4,    1,    4,    4,    4,    4,    4,
-        4,    4,    4,    4,    8,    8,    8,    8,    6,    7,
-        8,    8,    8,    8,    8,    8,    4,    4,    4,    4,
-        4,    4,    4,    4,    4,    1,    4,    4,    4,    4,
-        4,    4,    4,    4,    1,    4,    1,    4,    4,    4,
-        4,    4,    1,    1,    4,    4,    4,    4,    4,    4,
-        4,    1,    4,    4,    4,    4,    4,    4,    4,    4,
-        4,   11,   10,   10,    0,   10,    1,    4,    4,    4,
+        5,    5,    5,    5,    5,    5,    5,    1,    5,    1,
+        5,    5,    5,    5,    5,    1,    1,    5,    5,    5,
+        5,    5,    5,    5,    1,    5,    5,    5,    5,    5,
+        5,    5,    5,    5,    8,    8,    8,    8,    6,    7,
+        8,    8,    8,    8,    8,    8,    5,    5,    5,    5,
+        5,    5,    5,    5,    5,    1,    5,    5,    5,    5,
+        5,    5,    5,    5,    1,    5,    1,    5,    5,    5,
+        5,    5,    1,    1,    5,    5,    5,    5,    5,    5,
+        5,    1,    5,    5,    5,    5,    5,    5,    5,    5,
+        5,   11,   10,   10,    0,   10,    1,    5,    5,    5,
 
-        4,    4,    4,    1,    4,    4,    1,    4,    4,    4,
-        1,    4,    4,    4,    4,    4,    4,    1,    1,    1,
-        4,    4,    4,    4,    4,    4,    1,    4,    4,    4,
-        4,    4,    4,    4,    1,    4,    4,    4,    4,    8,
-        8,    8,    8,    8,    1,    4,    4,    4,    4,    4,
-        4,    1,    4,    4,    1,    4,    4,    4,    1,    4,
-        4,    4,    4,    4,    4,    1,    1,    1,    4,    4,
-        4,    4,    4,    4,    1,    4,    4,    4,    4,    4,
-        4,    4,    1,    4,    4,    4,    4,   10,    4,    4,
-        4,    1,    1,    4,    4,    1,    4,    4,    1,    4,
+        5,    5,    5,    1,    5,    5,    1,    5,    5,    5,
+        1,    5,    5,    5,    5,    5,    5,    1,    1,    1,
+        5,    5,    5,    5,    5,    5,    1,    5,    5,    5,
+        5,    5,    5,    5,    1,    5,    5,    5,    5,    8,
+        8,    8,    8,    8,    1,    5,    5,    5,    5,    5,
+        5,    1,    5,    5,    1,    5,    5,    5,    1,    5,
+        5,    5,    5,    5,    5,    1,    1,    1,    5,    5,
+        5,    5,    5,    5,    1,    5,    5,    5,    5,    5,
+        5,    5,    1,    5,    5,    5,    5,   10,    5,    5,
+        5,    1,    1,    5,    5,    1,    5,    5,    1,    5,
 
-        4,    1,    4,    4,    4,    4,    4,    4,    4,    4,
-        1,    1,    4,    4,    4,    1,    1,    1,    1,    4,
-        1,    4,    1,    1,    4,    8,    4,    4,    4,    1,
-        1,    4,    4,    1,    4,    4,    1,    4,    4,    1,
-        4,    4,    4,    4,    4,    4,    4,    4,    1,    1,
-        4,    4,    4,    1,    1,    1,    1,    4,    1,    4,
-        1,    1,    4,    1,    1,    4,    1,    4,    4,    1,
-        4,    4,    4,    4,    4,    1,    4,    4,    4,    4,
-        4,    4,    4,    4,    4,    1,    1,    1,    1,    1,
-        4,    1,    4,    4,    1,    4,    4,    4,    4,    4,
+        5,    1,    5,    5,    5,    5,    5,    5,    5,    5,
+        1,    1,    5,    5,    5,    1,    1,    1,    1,    5,
+        1,    5,    1,    1,    5,    8,    5,    5,    5,    1,
+        1,    5,    5,    1,    5,    5,    1,    5,    5,    1,
+        5,    5,    5,    5,    5,    5,    5,    5,    1,    1,
+        5,    5,    5,    1,    1,    1,    1,    5,    1,    5,
+        1,    1,    5,    1,    1,    5,    1,    5,    5,    1,
+        5,    5,    5,    5,    5,    1,    5,    5,    5,    5,
+        5,    5,    5,    5,    5,    1,    1,    1,    1,    1,
+        5,    1,    5,    5,    1,    5,    5,    5,    5,    5,
 
-        1,    4,    4,    4,    4,    4,    4,    4,    4,    4,
-        1,    1,    1,    4,    1,    4,    4,    4,    4,    4,
-        4,    4,    4,    1,    4,    4,    1,    1,    1,    1,
-        4,    4,    1,    4,    4,    4,    4,    4,    4,    4,
-        4,    1,    4,    4,    1,    1,    1,    1,    4,    1,
-        4,    1,    4,    4,    1,    4,    1,    4,    4,    1,
-        1,    1,    4,    1,    4,    4,    1,    4,    1,    4,
-        4,    1,    1,    1,    1,    4,    4,    4,    4,    1,
-        1,    4,    4,    4,    4,    4,    1,    1,    1,    4,
-        1,    1,    1,    4,    4,    4,    4,    4,    4,    4,
+        1,    5,    5,    5,    5,    5,    5,    5,    5,    5,
+        1,    1,    1,    5,    1,    5,    5,    5,    5,    5,
+        5,    5,    5,    1,    5,    5,    1,    1,    1,    1,
+        5,    5,    1,    5,    5,    5,    5,    5,    5,    5,
+        5,    1,    5,    5,    1,    1,    1,    1,    5,    1,
+        5,    1,    5,    5,    1,    5,    1,    5,    5,    1,
+        1,    1,    5,    1,    5,    5,    1,    5,    1,    5,
+        5,    1,    1,    1,    1,    5,    5,    5,    5,    1,
+        1,    5,    5,    5,    5,    5,    1,    1,    1,    5,
+        1,    1,    1,    5,    5,    5,    5,    5,    5,    5,
 
-        4,    1,    1,    0
+        5,    1,    1,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -1090,6 +1090,8 @@ char *yytext;
 #include <unordered_map> 
 #include <string>
 #include <fstream>
+#pragma warning(disable: 4996 6385 6011 4267 4244 4013 4312 4005 6387 26451)
+
 using namespace std;
 unordered_map<string, int> simbolos;
 unordered_map<string, int> numeros;
@@ -1099,10 +1101,10 @@ unordered_map<string, int> constantes_cadena;
 int contador_tab = 0;
 int contador_salto = 0;
 int columna = 0;
-void conteoColumnas(){columna = yyleng + 1;}
-#line 1103 "main.cpp"
-
+void conteoColumnas(){columna += int(yyleng);}
 #line 1105 "main.cpp"
+
+#line 1107 "main.cpp"
 
 #define INITIAL 0
 #define comentario 1
@@ -1320,10 +1322,10 @@ YY_DECL
 		}
 
 	{
-#line 48 "main.l"
+#line 50 "main.l"
 
 
-#line 1326 "main.cpp"
+#line 1328 "main.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1382,19 +1384,31 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 50 "main.l"
+#line 52 "main.l"
 {
 	if(palabras_reservadas.find(yytext) == palabras_reservadas.end())
 		palabras_reservadas[yytext] = 1;
 	else
 		++palabras_reservadas.at(yytext);
-	printf("ES PALABRA RESERVADA: %s \n", yytext);
+	conteoColumnas();
+	columna = columna - yyleng + 1;
+	printf("(%d,%d) ES PALABRA RESERVADA: %s\n",yylineno, columna, yytext);
+	columna = columna + yyleng -1;
+	
 }
 	YY_BREAK
 case 2:
-/* rule 2 can match eol */
 YY_RULE_SETUP
-#line 58 "main.l"
+#line 63 "main.l"
+{
+		conteoColumnas();		
+		printf("(%d,%d) ESPACIO ENCONTRADO: %s\n",yylineno, columna, yytext);
+}
+	YY_BREAK
+case 3:
+/* rule 3 can match eol */
+YY_RULE_SETUP
+#line 68 "main.l"
 {
 			contador_salto++;
 			conteoColumnas();
@@ -1402,43 +1416,36 @@ YY_RULE_SETUP
 			columna = 0;
 		}
 	YY_BREAK
-case 3:
+case 4:
 YY_RULE_SETUP
-#line 65 "main.l"
+#line 75 "main.l"
 {
 			contador_tab++;
 			conteoColumnas();
+			columna = columna - yyleng + 1;
+	
 			printf("(%d,%d) Tabulador numero %d encontrado: %s\n", columna, yylineno, contador_tab, yytext);
-
-		}
-	YY_BREAK
-case 4:
-YY_RULE_SETUP
-#line 72 "main.l"
-{
-			conteoColumnas();
-			printf("(%d,%d) Elemento reconocido: %s\n", columna, yylineno, yytext);
+			columna = columna + yyleng -1;
 		}
 	YY_BREAK
 case 5:
-/* rule 5 can match eol */
 YY_RULE_SETUP
-#line 77 "main.l"
+#line 84 "main.l"
 {
-			if (yyleng > 0) {
-		printf("Token reconocido: %.*s\n", int(yyleng), yytext);
-	}
-	conteoColumnas();
+			conteoColumnas();
+			columna = columna - yyleng + 1;
+			printf("(%d,%d) ELEMENTO RECONOCIDO: %s\n",yylineno, columna, yytext);
+			columna = columna + yyleng -1;
 		}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 84 "main.l"
+#line 92 "main.l"
 BEGIN(comentario);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 86 "main.l"
+#line 94 "main.l"
 {
     BEGIN(INITIAL);   
 }
@@ -1446,14 +1453,17 @@ YY_RULE_SETUP
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 90 "main.l"
+#line 98 "main.l"
 {
-    printf("COMENTARIO: %s\n", yytext);
+	conteoColumnas();
+	columna = columna - yyleng + 1;
+	printf("(%d,%d) COMENTARIO: %s\n",yylineno, columna, yytext);
+	columna = columna + yyleng -1;
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 94 "main.l"
+#line 105 "main.l"
 {
   if (simbolos.find(yytext) == simbolos.end()){
     simbolos[yytext] = 1;
@@ -1462,12 +1472,15 @@ YY_RULE_SETUP
     simbolos[yytext]++;
   }
 
-  printf("ES UN SIMBOLO: %s \n", yytext);
+	conteoColumnas();
+	columna = columna - yyleng + 1;
+	printf("(%d,%d) ES UN SIMBOLO: %s\n",yylineno, columna, yytext);
+	columna = columna + yyleng -1;
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 105 "main.l"
+#line 119 "main.l"
 {
   if (numeros.find(yytext) == numeros.end()){
     numeros[yytext] = 1;
@@ -1476,34 +1489,41 @@ YY_RULE_SETUP
     numeros[yytext]++;
   }
 
-  printf("ES UN NUMERO: %s \n", yytext);
+	conteoColumnas();
+	columna = columna - yyleng + 1;
+	printf("(%d,%d) ES UN NUMERO: %s\n",yylineno, columna, yytext);
+	columna = columna + yyleng -1;
 }
 	YY_BREAK
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 116 "main.l"
+#line 133 "main.l"
 {
 	if(constantes_cadena.find(yytext) == constantes_cadena.end())
 		constantes_cadena[yytext] = 1;
 	else
 		++constantes_cadena.at(yytext);
-	printf("ES UNA CADENA %s \n", yytext);
+
+	conteoColumnas();
+	columna = columna - yyleng + 1;
+	printf("(%d,%d) ES UNA CADENA: %s\n",yylineno, columna, yytext);
+	columna = columna + yyleng -1;
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 124 "main.l"
+#line 145 "main.l"
 {
 	conteoColumnas();
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 130 "main.l"
+#line 151 "main.l"
 ECHO;
 	YY_BREAK
-#line 1506 "main.cpp"
+#line 1526 "main.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comentario):
 	yyterminate();
@@ -2509,7 +2529,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 130 "main.l"
+#line 151 "main.l"
 
 
 int main(int argc, char* argv[])
@@ -2567,5 +2587,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
-

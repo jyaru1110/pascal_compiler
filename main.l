@@ -5,6 +5,8 @@
 #include <unordered_map> 
 #include <string>
 #include <fstream>
+#pragma warning(disable: 4996 6385 6011 4267 4244 4013 4312 4005 6387 26451)
+
 using namespace std;
 unordered_map<string, int> simbolos;
 unordered_map<string, int> numeros;
@@ -14,7 +16,7 @@ unordered_map<string, int> constantes_cadena;
 int contador_tab = 0;
 int contador_salto = 0;
 int columna = 0;
-void conteoColumnas(){columna = yyleng + 1;}
+void conteoColumnas(){columna += int(yyleng);}
 %}
 
 INCIO_COMENTARIO \{|(\(\*)
@@ -36,8 +38,8 @@ CONSTANTE_CADENA \"[^\"]+\"|\'[^\']+\'
 
 LINEA [\n]
 TABULADOR [\t]
+ESPACIO [" "]
 ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
-TOKENS [ \t\n]
 
 %s comentario
 
@@ -52,7 +54,15 @@ TOKENS [ \t\n]
 		palabras_reservadas[yytext] = 1;
 	else
 		++palabras_reservadas.at(yytext);
-	printf("ES PALABRA RESERVADA: %s \n", yytext);
+	conteoColumnas();
+	columna = columna - yyleng + 1;
+	printf("(%d,%d) ES PALABRA RESERVADA: %s\n",yylineno, columna, yytext);
+	columna = columna + yyleng -1;
+	
+}
+{ESPACIO} {
+		conteoColumnas();		
+		printf("(%d,%d) ESPACIO ENCONTRADO: %s\n",yylineno, columna, yytext);
 }
 
 {LINEA} 	{
@@ -65,21 +75,19 @@ TOKENS [ \t\n]
 {TABULADOR} 	{
 			contador_tab++;
 			conteoColumnas();
+			columna = columna - yyleng + 1;
+	
 			printf("(%d,%d) Tabulador numero %d encontrado: %s\n", columna, yylineno, contador_tab, yytext);
-
+			columna = columna + yyleng -1;
 		}
 
 {ELEMENTOS}	{
 			conteoColumnas();
-			printf("(%d,%d) Elemento reconocido: %s\n", columna, yylineno, yytext);
+			columna = columna - yyleng + 1;
+			printf("(%d,%d) ELEMENTO RECONOCIDO: %s\n",yylineno, columna, yytext);
+			columna = columna + yyleng -1;
 		}
 
-{TOKENS}	{
-			if (yyleng > 0) {
-		printf("Token reconocido: %.*s\n", int(yyleng), yytext);
-	}
-	conteoColumnas();
-		}
 
 {INCIO_COMENTARIO} BEGIN(comentario);
 
@@ -88,7 +96,10 @@ TOKENS [ \t\n]
 }
 
 <comentario>{PALABRA} {
-    printf("COMENTARIO: %s\n", yytext);
+	conteoColumnas();
+	columna = columna - yyleng + 1;
+	printf("(%d,%d) COMENTARIO: %s\n",yylineno, columna, yytext);
+	columna = columna + yyleng -1;
 }
 
 {SIMBOLOS_ESCRITURA} {
@@ -99,7 +110,10 @@ TOKENS [ \t\n]
     simbolos[yytext]++;
   }
 
-  printf("ES UN SIMBOLO: %s \n", yytext);
+	conteoColumnas();
+	columna = columna - yyleng + 1;
+	printf("(%d,%d) ES UN SIMBOLO: %s\n",yylineno, columna, yytext);
+	columna = columna + yyleng -1;
 }
 
 {NUMERO_CON_SIGNO} {
@@ -110,7 +124,10 @@ TOKENS [ \t\n]
     numeros[yytext]++;
   }
 
-  printf("ES UN NUMERO: %s \n", yytext);
+	conteoColumnas();
+	columna = columna - yyleng + 1;
+	printf("(%d,%d) ES UN NUMERO: %s\n",yylineno, columna, yytext);
+	columna = columna + yyleng -1;
 }
 
 {CONSTANTE_CADENA} {
@@ -118,7 +135,11 @@ TOKENS [ \t\n]
 		constantes_cadena[yytext] = 1;
 	else
 		++constantes_cadena.at(yytext);
-	printf("ES UNA CADENA %s \n", yytext);
+
+	conteoColumnas();
+	columna = columna - yyleng + 1;
+	printf("(%d,%d) ES UNA CADENA: %s\n",yylineno, columna, yytext);
+	columna = columna + yyleng -1;
 }
 
 . {
@@ -184,4 +205,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
