@@ -17,65 +17,61 @@ extern int yyerror(char *s);
     int numero;
 }
 
-%code requires {
-    #include <stdlib.h>
-}
-
 %%
 
-identifier-list:
+identifierlist:
     identifier
-    | identifier ',' identifier-list
+    | identifier ',' identifierlist
     ;
 
-variable-declaration: identifier-list ':' type ';'
+variabledeclaration: identifierlist ':' type ';'
     ;
 
-variable-reference: variable-identifier qualifiers
+variablereference: variableidentifier qualifiers
     ;
 
 qualifiers : qualifier
     | qualifier qualifiers
     ;
 
-variable-identifier: identifier
+variableidentifier: identifier
     ;
 
 qualifier: index
-    | field-designator
-    | file-buffer-symbol
-    | pointer-object-symbol
+    | fielddesignator
+    | filebuffersymbol
+    | pointerobjectsymbol
     ;
 
 index : '[' expressions']'
     ;
 
-expresions: expression
+expressions: expression
     | expression ',' expressions
     ;
 
-field-designator: '.' identifier
+fielddesignator: '.' identifier
     ;
 
-file-buffer-symbol: '^'
+filebuffersymbol: '^'
     ;
 
-pointer-object-symbol: '^'
+pointerobjectsymbol: '^'
     ;
 
-factor: '@' variable-reference
-    | variable-reference
-    | unsigned-constant
-    | function-call
-    | set-constructor
+factor: '@' variablereference
+    | variablereference
+    | unsignedconstant
+    | functioncall
+    | setconstructor
     | '(' expression ')'
     | 'not' factor
     ;
 
-unsigned-constant: unsigned-number
-    | quoted-string-constant
+unsignedconstant: unsignednumber
+    | quotedstringconstant
     | 'nil'
-    | constant-identifier
+    | constantidentifier
     ;
 
 term: factor
@@ -86,138 +82,138 @@ term: factor
     | factor 'and' term
     ;
 
-simple-expression: sign unsigned-expression
-    | unsigned-expression
+simpleexpression: sign unsignedexpression
+    | unsignedexpression
     ;
 
-unsigned-expression: term '+' unsigned-expression
-    | term '-' unsigned-expression
-    | term 'or' unsigned-expression
+unsignedexpression: term '+' unsignedexpression
+    | term '' unsignedexpression
+    | term 'or' unsignedexpression
     | term
     ;
 
-expression: simple-expression '-' simple-expression
-    | simple-expression '<' simple-expression
-    | simple-expression '>' simple-expression
-    | simple-expression '<=' simple-expression
-    | simple-expression '>=' simple-expression
-    | simple-expression '<>' simple-expression
-    | simple-expression 'in' simple-expression
+expression: simpleexpression '' simpleexpression
+    | simpleexpression '<' simpleexpression
+    | simpleexpression '>' simpleexpression
+    | simpleexpression '<=' simpleexpression
+    | simpleexpression '>=' simpleexpression
+    | simpleexpression '<>' simpleexpression
+    | simpleexpression 'in' simpleexpression
     ;
 
-function-call: function-identifier
-    | function-identifier actual-parameter-list
+functioncall: functionidentifier
+    | functionidentifier actualparameterlist
     ;
 
-actual-parameter-list: '(' actual-parameter-group ')'
+actualparameterlist: '(' actualparametergroup ')'
     ;
 
-actual-parameter-group: actual-parameter
-    | actual-parameter-group ','
+actualparametergroup: actualparameter
+    | actualparametergroup ','
     ;
 
-actual-parameter: expression 
-    | variable-reference
-    | procedure-identifier
-    | function-identifier
+actualparameter: expression 
+    | variablereference
+    | procedureidentifier
+    | functionidentifier
     ;
 
-set-constructor: '[' member-groups ']'
+setconstructor: '[' membergroups ']'
     ;
 
-member-groups: member-group
-    | member-groups ','
+membergroups: membergroup
+    | membergroups ','
     ;
 
-member-group: expression
+membergroup: expression
     | expression '..' expression
     ;
 
-statement: label '..' simple-statement
-    | label '..' structured-statement
+statement: label '..' simplestatement
+    | label '..' structuredstatement
     | label '..'
-    | simple-statement
-    | structured-statement
+    | simplestatement
+    | structuredstatement
     |
     ;
 
-simple-statement: assignment-statement
-    | procedure-statement
-    | goto-statement
+simplestatement: assignmentstatement
+    | procedurestatement
+    | gotostatement
     ;
 
-assignment-statement: variable-reference ':=' expression;
-    | function-identifier ':=' expression;
+assignmentstatement: variablereference ':=' expression;
+    | functionidentifier ':=' expression;
 
-procedure-statement: procedure-identifier
-    | procedure-identifier actual-parameter-list
+procedurestatement: procedureidentifier
+    | procedureidentifier actualparameterlist
     ;
 
-goto-statement: goto label
+gotostatement: goto label
     ;
 
-structured-statement: compound-statement
-    | conditional-statement
-    | repetitive-statement
-    | with-statement
+structuredstatement: compoundstatement
+    | conditionalstatement
+    | repetitivestatement
+    | withstatement
     ;
 
-compound-statement: 'begin' statements 'end';
+compoundstatement: 'begin' statements 'end';
 
 statements: statement
     |statements ';'
     ;
 
-conditional-statement: if-statement
-    | case-statement
+conditionalstatement: ifstatement
+    | casestatement
     ;
 
-if-statement: 'if' expression 'then' statement
+ifstatement: 'if' expression 'then' statement
     | 'if' expression 'then' statement 'else' statement
     ;
 
-case-statement: 'case' expression 'of' cases 'end'
-    | 'case' expression 'of' cases otherwise-clause 'end' 
+casestatement: 'case' expression 'of' cases 'end'
+    | 'case' expression 'of' cases otherwiseclause 'end' 
     | 'case' expression 'of' cases ';' 'end' 
-    | 'case' expression 'of' cases otherwise-clause ';' 'end'
+    | 'case' expression 'of' cases otherwiseclause ';' 'end'
     ;
 
 cases: cases ','
     | case
     ;
 
-otherwise-clause: ';' 'otherwise' statement
+otherwiseclause: ';' 'otherwise' statement
     ;
 
-repetitive-statement: repeat-statement
-    | while-statement
-    | for-statement
+repetitivestatement: repeatstatement
+    | whilestatement
+    | forstatement
     ;
 
-repeat-statement: 'repeat' statements 'until' expression
+repeatstatement: 'repeat' statements 'until' expression
     ;
 
-while-statement: 'while' expression 'do' statement
+whilestatement: 'while' expression 'do' statement
     ;
 
-for-statement: 'for' control-variable ':=' initial-value 'to' final-value 'do' statement
-    | 'for' control-variable ':=' initial-value 'downto' final-value 'do' statement
+forstatement: 'for' controlvariable ':=' initialvalue 'to' finalvalue 'do' statement
+    | 'for' controlvariable ':=' initialvalue 'downto' finalvalue 'do' statement
     ;
 
-control-variable: variable-identifier
+controlvariable: variableidentifier
     ;
 
-initial-value: expression
+initialvalue: expression
     ;
 
-final-value:expression
+finalvalue:expression
     ;
 
-with-statement: 'with' record-variable-references 'do' statement
+withstatement: 'with' recordvariablereferences 'do' statement
     ;
 
-record-variable-references: record-variable-reference
-    | record-variable-references ','
+recordvariablereferences: recordvariablereference
+    | recordvariablereferences ','
     ;
 
 %%

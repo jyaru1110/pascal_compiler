@@ -41,12 +41,12 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 
 %%
 
-{IDENTIFICADOR}{
-	return identifier
-}
-
 {PALABRAS_RESERVADAS} {
 	return *yytext;
+}
+
+{IDENTIFICADOR} {
+	return identifier
 }
 
 {ESPACIO} {
