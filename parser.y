@@ -1,4 +1,4 @@
-%token DIGITOS DIGITOS_HEX SIGNO FACTOR ENTERO_SIN_SIGNO NUMERO_SIN_SIGNO CONSTANTE_CADENA LINEA TABULADOR ESPACIO ELEMENTOS, NUMERO_CON_SIGNO 
+%token identifier
 
 %{
 #include <stdio.h>
@@ -7,8 +7,8 @@
 extern int columna;
 extern FILE *yyin;
 
-int yylex();
-void yyerror(const char *s);
+extern int yylex(void);
+extern int yyerror(char *s);
 
 %}
 
@@ -23,89 +23,214 @@ void yyerror(const char *s);
 
 %%
 
-identificador: cadena  {$$ = $1;}
-              | identificador identificador_2;
-identificador_2: identificador_2 | "_";
+identifier-list:
+    identifier
+    | identifier ',' identifier-list
+    ;
 
-secuencia_digito: secuencia_digito DIGITOS {$$ = $1;}
-                | DIGITOS {$$ = $1;}
-                ;
+variable-declaration: identifier-list ':' type ';'
+    ;
 
-secuencia_digito_hex: secuencia_digito_hex DIGITOS_HEX {$$ = $1;}
-                     | DIGITOS_HEX {$$ = $1;}
-                     ;
-string_caracter:CONSTANTE_CADENA  {$$ = $1;}
-                | \' \';
+variable-reference: variable-identifier qualifiers
+    ;
 
-quoted_string_constant: string_caracter {$$ = $1;}
-                      ;
+qualifiers : qualifier
+    | qualifier qualifiers
+    ;
 
-quoted_character_constant:  \' string_caracter \'
-			|;
+variable-identifier: identifier
+    ;
 
-constant_declaration: identificador '=' constant ';'
-			|;
+qualifier: index
+    | field-designator
+    | file-buffer-symbol
+    | pointer-object-symbol
+    ;
 
-constant: SIGNO identificador
-	| NUMERO_CON_SIGNO
-	| quoted_string_constant
-	| quoted_character_constant;
-block: 
+index : '[' expressions']'
+    ;
+
+expresions: expression
+    | expression ',' expressions
+    ;
+
+field-designator: '.' identifier
+    ;
+
+file-buffer-symbol: '^'
+    ;
+
+pointer-object-symbol: '^'
+    ;
+
+factor: '@' variable-reference
+    | variable-reference
+    | unsigned-constant
+    | function-call
+    | set-constructor
+    | '(' expression ')'
+    | 'not' factor
+    ;
+
+unsigned-constant: unsigned-number
+    | quoted-string-constant
+    | 'nil'
+    | constant-identifier
+    ;
+
+term: factor
+    | factor '*' term
+    | factor '/' term
+    | factor 'div' term
+    | factor 'mod' term
+    | factor 'and' term
+    ;
+
+simple-expression: sign unsigned-expression
+    | unsigned-expression
+    ;
+
+unsigned-expression: term '+' unsigned-expression
+    | term '-' unsigned-expression
+    | term 'or' unsigned-expression
+    | term
+    ;
+
+expression: simple-expression '-' simple-expression
+    | simple-expression '<' simple-expression
+    | simple-expression '>' simple-expression
+    | simple-expression '<=' simple-expression
+    | simple-expression '>=' simple-expression
+    | simple-expression '<>' simple-expression
+    | simple-expression 'in' simple-expression
+    ;
+
+function-call: function-identifier
+    | function-identifier actual-parameter-list
+    ;
+
+actual-parameter-list: '(' actual-parameter-group ')'
+    ;
+
+actual-parameter-group: actual-parameter
+    | actual-parameter-group ','
+    ;
+
+actual-parameter: expression 
+    | variable-reference
+    | procedure-identifier
+    | function-identifier
+    ;
+
+set-constructor: '[' member-groups ']'
+    ;
+
+member-groups: member-group
+    | member-groups ','
+    ;
+
+member-group: expression
+    | expression '..' expression
+    ;
+
+statement: label '..' simple-statement
+    | label '..' structured-statement
+    | label '..'
+    | simple-statement
+    | structured-statement
+    |
+    ;
+
+simple-statement: assignment-statement
+    | procedure-statement
+    | goto-statement
+    ;
+
+assignment-statement: variable-reference ':=' expression;
+    | function-identifier ':=' expression;
+
+procedure-statement: procedure-identifier
+    | procedure-identifier actual-parameter-list
+    ;
+
+goto-statement: goto label
+    ;
+
+structured-statement: compound-statement
+    | conditional-statement
+    | repetitive-statement
+    | with-statement
+    ;
+
+compound-statement: 'begin' statements 'end';
+
+statements: statement
+    |statements ';'
+    ;
+
+conditional-statement: if-statement
+    | case-statement
+    ;
+
+if-statement: 'if' expression 'then' statement
+    | 'if' expression 'then' statement 'else' statement
+    ;
+
+case-statement: 'case' expression 'of' cases 'end'
+    | 'case' expression 'of' cases otherwise-clause 'end' 
+    | 'case' expression 'of' cases ';' 'end' 
+    | 'case' expression 'of' cases otherwise-clause ';' 'end'
+    ;
+
+cases: cases ','
+    | case
+    ;
+
+otherwise-clause: ';' 'otherwise' statement
+    ;
+
+repetitive-statement: repeat-statement
+    | while-statement
+    | for-statement
+    ;
+
+repeat-statement: 'repeat' statements 'until' expression
+    ;
+
+while-statement: 'while' expression 'do' statement
+    ;
+
+for-statement: 'for' control-variable ':=' initial-value 'to' final-value 'do' statement
+    | 'for' control-variable ':=' initial-value 'downto' final-value 'do' statement
+    ;
+
+control-variable: variable-identifier
+    ;
+
+initial-value: expression
+    ;
+
+final-value:expression
+    ;
+
+with-statement: 'with' record-variable-references 'do' statement
+    ;
+
+record-variable-references: record-variable-reference
+    | record-variable-references ','
+    ;
 
 %%
 
 int main(int argc, char* argv[])
 {
-	if(argc > 1)
-	{
-		++argv;
-		yyin = fopen(argv[0], "rt");
-		
-		if(!yyin)
-		{
-			printf("El archivo %s no puede ser abierto. Entrada tradicional.\n", argv[0]);
-			yyin = stdin;
-		}
-	}
-	else
-	{
-		yyin = stdin;
-	}
-	
-	yylex();
-	std::ofstream myfile;
-	int i = 1;
-	myfile.open ("palabras_reservadas.csv");
-	for(auto it = palabras_reservadas.begin(); it != palabras_reservadas.end(); ++it)
-	{
-		
-		myfile <<i++<<","<< it->first << "," << it->second << "\n";
-	}
-	myfile.close();
+	if ( argc > 0 ){
+      yyin = fopen( argv[0], "r" );
+    }
+            
+    else
+            yyin = stdin;
 
-	myfile.open ("constantes_cadena.csv");
-	i = 1;
-	for(auto it = constantes_cadena.begin(); it != constantes_cadena.end(); ++it)
-	{
-		myfile <<i++<<","<< it->first << "," << it->second << "\n";
-	}
-	myfile.close();
-
-	myfile.open ("simbolos.csv");
-	i = 1;
-	for(auto it = simbolos.begin(); it != simbolos.end(); ++it)
-	{
-		myfile <<i++<<","<< it->first << "," << it->second << "\n";
-	}
-	myfile.close();
-
-	myfile.open ("numeros.csv");
-	i = 1;
-	for(auto it = numeros.begin(); it != numeros.end(); ++it)
-	{
-		myfile <<i++<<","<< it->first << "," << it->second << "\n";
-	}
-	myfile.close();
-
+    yyparse();
 	return 0;
 }
