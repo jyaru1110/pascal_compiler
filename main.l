@@ -74,13 +74,14 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 {INCIO_COMENTARIO} BEGIN(comentario);
 
 <comentario>{FIN_COMENTARIO} {
-    BEGIN(INITIAL);   
+    BEGIN(INITIAL);
 }
 
 <comentario>{PALABRA} {
 }
 
 {SIMBOLOS_ESCRITURA} {
+	return *yytext;
 
 }
 
