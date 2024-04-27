@@ -1,4 +1,4 @@
-%token identifier anychar sign signednumber digitsequence constantidentifier unsignedinteger
+%token identifier anychar sign signednumber digitsequence constantidentifier unsignedinteger unsignednumber
 
 %{
 #include <stdio.h>
@@ -23,6 +23,21 @@ label: digitsequence
     ;
 
 quotedstringconstant:"'" stringcharacter "'"
+    ;
+
+functionidentifier: identifier
+    ;
+
+procedureidentifier: identifier
+    ;
+
+typeidentifier: identifier
+    ;
+
+structuredtypeidentifier: identifier
+    ;
+    
+pointertypeidentifier: identifier
     ;
 
 stringcharacter: anychar
@@ -348,7 +363,7 @@ procedurestatement: procedureidentifier
     | procedureidentifier actualparameterlist
     ;
 
-gotostatement: goto label
+gotostatement: 'goto' label
     ;
 
 structuredstatement: compoundstatement
@@ -379,6 +394,12 @@ casestatement: 'case' expression 'of' cases 'end'
 
 cases: cases ','
     | case
+    ;
+
+case: constants ':' statement;
+
+constants: constants constant
+    | constant
     ;
 
 otherwiseclause: ';' 'otherwise' statement
@@ -415,6 +436,9 @@ recordvariablereferences: recordvariablereference
     | recordvariablereferences ','
     ;
 
+recordvariablereference: variablereference
+    ;
+
 proceduredeclaration: procedureheading ';' procedurebody ';' 
 ;
 
@@ -423,7 +447,7 @@ procedurebody: block
   | 'external'
 ;
 
-procedureheading: 'procedure' identifer optionalformalparameterlist
+procedureheading: 'procedure' identifier optionalformalparameterlist
 ;
 
 optionalformalparameterlist: formalparameterlist
