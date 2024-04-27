@@ -149,7 +149,7 @@ procedurestatement: procedureidentifier
     | procedureidentifier actualparameterlist
     ;
 
-gotostatement: goto label
+gotostatement: 'goto' label
     ;
 
 structuredstatement: compoundstatement
