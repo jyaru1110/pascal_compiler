@@ -182,6 +182,12 @@ cases: cases ','
     | case
     ;
 
+case: constants ':' statement;
+
+constants: constants constant
+    | constant
+    ;
+
 otherwiseclause: ';' 'otherwise' statement
     ;
 
