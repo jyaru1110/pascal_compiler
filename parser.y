@@ -16,6 +16,10 @@ int yyerror(const char *s);
 
 %%
 
+program: programheading ";" optionalprogramuseclause block
+;
+
+
 label: digitsequence
     ;
 
@@ -481,9 +485,6 @@ formalparameters: formalparameter ";" formalparameters
 ;
 
 formalparameterlist: "(" formalparameters ")"
-;
-
-program: programheading ";" optionalprogramuseclause block
 ;
 
 optionalprogramuseclause: usesclause ";" 
