@@ -14,6 +14,10 @@ SIMBOLOS_ESCRITURA \@|\#|\<\>|\<\=|\>\=|\+|\-|\*|\/|\<|\>|\^|\;|\=|\,|\(|\)|\[|\
 
 IDENTIFICADOR [a-zA-Z][a-zA-Z0-9_]*
 
+ORDINAL_TYPE_IDENTIFIER (integer)|(char)|(boolean)|(longint)
+
+SIMPLE_EXPRESSION_OPERANDS -|<|>|<=|>=|<>|in;
+
 DIGIT [0-9]+
 DIGITOS_HEX [0-9a-fA-F]+
 SIGNO \+|\-
@@ -23,10 +27,11 @@ REAL_SIN_SIGNO {DIGIT}(.{DIGIT}|{FACTOR})
 NUMERO_SIN_SIGNO {ENTERO_SIN_SIGNO}|{REAL_SIN_SIGNO}
 NUMERO_CON_SIGNO {SIGNO}?{NUMERO_SIN_SIGNO}
 CONSTANTE_CADENA \"[^\"]+\"|\'[^\']+\'
+COMILLA \'
 
 LINEA [\n]
 TABULADOR [\t]
-ESPACIO [" "]
+ESPACIO [ ]
 ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 
 
@@ -37,6 +42,18 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 %option case-insensitive
 
 %%
+
+{COMILLA} {
+	return comilla;
+}
+
+{SIMPLE_EXPRESSION_OPERANDS} {
+	return simpleexpressionoperands;
+}
+
+{ORDINAL_TYPE_IDENTIFIER} {
+	return ordinaltypeidentifier;
+}
 
 {DIGIT} {
 	return digitsequence;
@@ -63,12 +80,15 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 }
 
 {ESPACIO} {
+	return space;
 }
 
 {LINEA} 	{
+	return newline;
 		}
 
 {TABULADOR} 	{
+	return tab;
 		}
 
 {INCIO_COMENTARIO} BEGIN(comentario);
@@ -89,6 +109,7 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 }
 
 . {
+	printf("Caracter no valido: %s\n", yytext);
 	yyerror("Caracter no valido");
 }
 

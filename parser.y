@@ -1,4 +1,4 @@
-%token identifier anychar sign signednumber digitsequence constantidentifier unsignedinteger unsignednumber
+%token identifier anychar sign signednumber digitsequence constantidentifier unsignedinteger unsignednumber ordinaltypeidentifier simpleexpressionoperands space newline tab comilla
 
 %{
 #include <stdio.h>
@@ -16,14 +16,14 @@ int yyerror(const char *s);
 
 %%
 
-program: programheading ";" optionalprogramuseclause block
+program: programheading ';' optionalprogramuseclause block
 ;
 
 
 label: digitsequence
     ;
 
-quotedstringconstant:"'" stringcharacter "'"
+quotedstringconstant:comillas stringcharacter comillas
     ;
 
 functionidentifier: identifier
@@ -42,13 +42,13 @@ pointertypeidentifier: identifier
     ;
 
 stringcharacter: anychar
-    |"'" "'"
+    |comilla comilla
     ;
 
-quotedcharacterconstant: "'" stringcharacter "'"
+quotedcharacterconstant: comilla stringcharacter comilla
     ;
 
-constantdeclaration: identifier "=" constant ";"
+constantdeclaration: identifier '=' constant ';'
     ;
 
 constant: identifier
@@ -66,28 +66,28 @@ block: statementpart
     | labeldeclarationpart
     ;
 
-labeldeclarationpart: "label" labels ";"
+labeldeclarationpart: 'label' labels ';'
     ;
 
 labels: label
-    | label "," labels
+    | label ',' labels
     ;
 
-constantdeclarationpart: "const" constantdeclarations
+constantdeclarationpart: 'const' constantdeclarations
     ;
 
 constantdeclarations: constantdeclaration
     | constantdeclaration constantdeclarations
     ;
 
-typedeclarationpart: "type" typedeclarations
+typedeclarationpart: 'type' typedeclarations
     ;
 
 typedeclarations: typedeclaration
     | typedeclaration typedeclarations
     ;
 
-variabledeclarationpart: "var" variabledeclarations
+variabledeclarationpart: 'var' variabledeclarations
     ;
 
 variabledeclarations: variabledeclaration
@@ -103,7 +103,7 @@ procedureandfunctiondeclarationpart: proceduredeclaration
 statementpart: compoundstatement
     ;
 
-typedeclaration: identifier "=" type ";"
+typedeclaration: identifier '=' type ';'
     ;
 
 type: simpletype
@@ -119,7 +119,7 @@ simpletype: ordinaltype
 realtype: realtypeidentifier
     ;
 
-realtypeidentifier: "real"
+realtypeidentifier: 'real'
     ;
 
 ordinaltype: subrangetype
@@ -127,13 +127,7 @@ ordinaltype: subrangetype
     | ordinaltypeidentifier
     ;
 
-ordinaltypeidentifier: "integer"
-    | "longint"
-    | "char"
-    | "boolean"
-    ;
-
-stringtype: "string" "[" sizeattribute "]"
+stringtype: 'string' '[' sizeattribute ']'
     | stringtypeidentifier
     ;
 
@@ -144,24 +138,24 @@ stringtypeidentifier: identifier
 sizeattribute: unsignedinteger
     ;
 
-enumeratedtype: "(" identifierlist ")"
+enumeratedtype: '(' identifierlist ')'
     ;
 
-subrangetype: constant ".." constant
+subrangetype: constant '..' constant
     ;
 
 structuredtype: arraytype
     | settype
     | filetype
     | recordtype
-    | "packed" arraytype
-    | "packed" settype
-    | "packed" filetype
-    | "packed" recordtype
+    | 'packed' arraytype
+    | 'packed' settype
+    | 'packed' filetype
+    | 'packed' recordtype
     | structuredtypeidentifier
     ;
 
-arraytype: "array" "[" indextypes "]" "of" type
+arraytype: 'array' '[' indextypes ']' 'of' type
     ;
 
 indextypes: indextype
@@ -171,61 +165,61 @@ indextypes: indextype
 indextype: ordinaltype
     ;
 
-recordtype: "record" "end"
-    | "record" fieldlist "end"
+recordtype: 'record' 'end'
+    | 'record' fieldlist 'end'
     ;
 
 fieldlist: fixedpart
-    | fixedpart ";" variantpart
-    | fixedpart ";" variantpart ";"
+    | fixedpart ';' variantpart
+    | fixedpart ';' variantpart ';'
     | variantpart
-    | variantpart ";"
+    | variantpart ';'
     ;
 
 fixedpart: fielddeclarations
     ;
 
 fielddeclarations: fielddeclaration
-    | fielddeclaration ";" fielddeclarations
+    | fielddeclaration ';' fielddeclarations
     ;
 
-fielddeclaration: identifierlist ":" type
+fielddeclaration: identifierlist ':' type
     ;
 
-variantpart: "case" tagfieldtype "of" variants
-    | "case" identifier ":" tagfieldtype "of" variants
+variantpart: 'case' tagfieldtype 'of' variants
+    | 'case' identifier ':' tagfieldtype 'of' variants
     ;
 
 variants: variant
-    | variant ";" variants
+    | variant ';' variants
     ;
 
-variant: constants ":" "(" ")"
-    | constants ":" "(" fieldlist ")"
+variant: constants ':' '(' ')'
+    | constants ':' '(' fieldlist ')'
     ;
 
 constants: constant
-    | constant "," constants
+    | constant ',' constants
     ;
 
 tagfieldtype: ordinaltypeidentifier
     ;
 
-settype: "set" "of" ordinaltype
+settype: 'set' 'of' ordinaltype
     ;
 
-filetype: "file"
-    | "file" "of" type
+filetype: 'file'
+    | 'file' 'of' type
     ;
 
-pointertype: "^" basetype
+pointertype: '^' basetype
     | pointertypeidentifier
     ;
 
 basetype: typeidentifier
     ;
 
-variabledeclaration: identifierlist ":" type ";"
+variabledeclaration: identifierlist ':' type ';'
     ;
 
 variablereference: variableidentifier
@@ -236,10 +230,10 @@ variablereference: variableidentifier
 
 identifierlist:
     identifier
-    | identifier "," identifierlist
+    | identifier ',' identifierlist
     ;
 
-variabledeclaration: identifierlist ":" type ";"
+variabledeclaration: identifierlist ':' type ';'
     ;
 
 variablereference: variableidentifier qualifiers
@@ -258,62 +252,56 @@ qualifier: index
     | pointerobjectsymbol
     ;
 
-index : "[" expressions"]"
+index : '[' expressions']'
     ;
 
 expressions: expression
-    | expression "," expressions
+    | expression ',' expressions
     ;
 
-fielddesignator: "." identifier
+fielddesignator: '.' identifier
     ;
 
-filebuffersymbol: "^"
+filebuffersymbol: '^'
     ;
 
-pointerobjectsymbol: "^"
+pointerobjectsymbol: '^'
     ;
 
-factor: "@" variablereference
+factor: '@' variablereference
     | variablereference
     | unsignedconstant
     | functioncall
     | setconstructor
-    | "(" expression ")"
-    | "not" factor
+    | '(' expression ')'
+    | 'not' factor
     ;
 
 unsignedconstant: unsignednumber
     | quotedstringconstant
-    | "nil"
+    | 'nil'
     | constantidentifier
     ;
 
 term: factor
-    | factor "*" term
-    | factor "/" term
-    | factor "div" term
-    | factor "mod" term
-    | factor "and" term
+    | factor '*' term
+    | factor '/' term
+    | factor 'div' term
+    | factor 'mod' term
+    | factor 'and' term
     ;
 
 simpleexpression: sign unsignedexpression
     | unsignedexpression
     ;
 
-unsignedexpression: term "+" unsignedexpression
-    | term "-" unsignedexpression
-    | term "or" unsignedexpression
+unsignedexpression: term '+' unsignedexpression
+    | term '-' unsignedexpression
+    | term 'or' unsignedexpression
     | term
     ;
 
-expression: simpleexpression "-" simpleexpression
-    | simpleexpression "<" simpleexpression
-    | simpleexpression ">" simpleexpression
-    | simpleexpression "<=" simpleexpression
-    | simpleexpression ">=" simpleexpression
-    | simpleexpression "<>" simpleexpression
-    | simpleexpression "in" simpleexpression
+expression: simpleexpression simpleexpressionoperands simpleexpression
     | simpleexpression
     ;
 
@@ -321,11 +309,11 @@ functioncall: functionidentifier
     | functionidentifier actualparameterlist
     ;
 
-actualparameterlist: "(" actualparametergroup ")"
+actualparameterlist: '(' actualparametergroup ')'
     ;
 
 actualparametergroup: actualparameter
-    | actualparametergroup ","
+    | actualparametergroup ','
     ;
 
 actualparameter: expression 
@@ -334,19 +322,19 @@ actualparameter: expression
     | functionidentifier
     ;
 
-setconstructor: "[" membergroups "]"
+setconstructor: '[' membergroups ']'
     ;
 
 membergroups: membergroup
-    | membergroups ","
+    | membergroups ','
     ;
 membergroup: expression
-    | expression ".." expression
+    | expression '..' expression
     ;
 
-statement: label ".." simplestatement
-    | label ".." structuredstatement
-    | label ".."
+statement: label '..' simplestatement
+    | label '..' structuredstatement
+    | label '..'
     | simplestatement
     | structuredstatement
     |
@@ -357,14 +345,14 @@ simplestatement: assignmentstatement
     | gotostatement
     ;
 
-assignmentstatement: variablereference ":=" expression;
-    | functionidentifier ":=" expression;
+assignmentstatement: variablereference ':=' expression;
+    | functionidentifier ':=' expression;
 
 procedurestatement: procedureidentifier
     | procedureidentifier actualparameterlist
     ;
 
-gotostatement: "goto" label
+gotostatement: 'goto' label
     ;
 
 structuredstatement: compoundstatement
@@ -373,37 +361,37 @@ structuredstatement: compoundstatement
     | withstatement
     ;
 
-compoundstatement: "begin" statements "end";
+compoundstatement: 'begin' statements 'end';
 
 statements: statement
-    |statements ";"
+    |statements ';'
     ;
 
 conditionalstatement: ifstatement
     | casestatement
     ;
 
-ifstatement: "if" expression "then" statement
-    | "if" expression "then" statement "else" statement
+ifstatement: 'if' expression 'then' statement
+    | 'if' expression 'then' statement 'else' statement
     ;
 
-casestatement: "case" expression "of" cases "end"
-    | "case" expression "of" cases otherwiseclause "end" 
-    | "case" expression "of" cases ";" "end" 
-    | "case" expression "of" cases otherwiseclause ";" "end"
+casestatement: 'case' expression 'of' cases 'end'
+    | 'case' expression 'of' cases otherwiseclause 'end' 
+    | 'case' expression 'of' cases ';' 'end' 
+    | 'case' expression 'of' cases otherwiseclause ';' 'end'
     ;
 
-cases: cases ","
+cases: cases ','
     | case
     ;
 
-case: constants ":" statement;
+case: constants ':' statement;
 
 constants: constants constant
     | constant
     ;
 
-otherwiseclause: ";" "otherwise" statement
+otherwiseclause: ';' 'otherwise' statement
     ;
 
 repetitivestatement: repeatstatement
@@ -411,14 +399,14 @@ repetitivestatement: repeatstatement
     | forstatement
     ;
 
-repeatstatement: "repeat" statements "until" expression
+repeatstatement: 'repeat' statements 'until' expression
     ;
 
-whilestatement: "while" expression "do" statement
+whilestatement: 'while' expression 'do' statement
     ;
 
-forstatement: "for" controlvariable ":=" initialvalue "to" finalvalue "do" statement
-    | "for" controlvariable ":=" initialvalue "downto" finalvalue "do" statement
+forstatement: 'for' controlvariable ':=' initialvalue 'to' finalvalue 'do' statement
+    | 'for' controlvariable ':=' initialvalue 'downto' finalvalue 'do' statement
     ;
 
 controlvariable: variableidentifier
@@ -430,40 +418,40 @@ initialvalue: expression
 finalvalue:expression
     ;
 
-withstatement: "with" recordvariablereferences "do" statement
+withstatement: 'with' recordvariablereferences 'do' statement
     ;
 
 recordvariablereferences: recordvariablereference
-    | recordvariablereferences ","
+    | recordvariablereferences ','
     ;
 
 recordvariablereference: variablereference
     ;
 
-proceduredeclaration: procedureheading ";" procedurebody ";" 
+proceduredeclaration: procedureheading ';' procedurebody ';' 
 ;
 
 procedurebody: block
-  | "forward"
-  | "external"
+  | 'forward'
+  | 'external'
 ;
 
-procedureheading: "procedure" identifier optionalformalparameterlist
+procedureheading: 'procedure' identifier optionalformalparameterlist
 ;
 
 optionalformalparameterlist: formalparameterlist
   |
 ;
 
-functiondeclaration: functionheading ";" functionbody ";"
+functiondeclaration: functionheading ';' functionbody ';'
 ;
 
 functionbody: block
-  | "forward"
-  | "external"
+  | 'forward'
+  | 'external'
 ;
 
-functionheading: "function" identifier optionalformalparameterlist ":" resulttype 
+functionheading: 'function' identifier optionalformalparameterlist ':' resulttype 
 ;
 
 resulttype: ordinaltypeidentifier 
@@ -476,44 +464,44 @@ formalparameter: parameterdeclaration
   | functionheading
 ;
 
-parameterdeclaration: "var" identifierlist ":" typeidentifier 
-  | identifierlist ":" typeidentifier
+parameterdeclaration: 'var' identifierlist ':' typeidentifier 
+  | identifierlist ':' typeidentifier
 ;
 
-formalparameters: formalparameter ";" formalparameters 
+formalparameters: formalparameter ';' formalparameters 
   | formalparameter
 ;
 
-formalparameterlist: "(" formalparameters ")"
+formalparameterlist: '(' formalparameters ')'
 ;
 
-optionalprogramuseclause: usesclause ";" 
+optionalprogramuseclause: usesclause ';' 
   |
 ;
 
-programheading: "program" identifier optionalprogramheadingparameters
+programheading: 'program' identifier optionalprogramheadingparameters
 ;
 
-optionalprogramheadingparameters: "(" programparameters ")" 
+optionalprogramheadingparameters: '(' programparameters ')' 
   |
 ;
 
 programparameters: identifierlist
 ;
 
-usesclause: "uses" identifierlist
+usesclause: 'uses' identifierlist
 ;
 
-regularunit: unitheading ";" interfacepart implementationpart "end" "."
+regularunit: unitheading ';' interfacepart implementationpart 'end' '.'
 ;
 
-unitheading: "unit" identifier
+unitheading: 'unit' identifier
 ;
 
-interfacepart: "interface" optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+interfacepart: 'interface' optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 ;
 
-implementationpart: "implementation" optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+implementationpart: 'implementation' optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 ;
 
 optionalunituseclause: usesclause 
@@ -540,14 +528,14 @@ optionalunitprocedureandfunctiondeclarationpart: procedureandfunctiondeclaration
 
 int yyerror(const char *s) 
 {
-   printf("Error %s\n", s);
+   printf('Error %s\n', s);
    return 0;
 }
 
 int main(int argc, char* argv[])
 {
 	if ( argc > 0 ){
-      yyin = fopen( argv[0], "r" );
+      yyin = fopen( argv[0], 'r' );
     }
             
     else
