@@ -95,12 +95,9 @@
 #include <stdio.h>
 #pragma warning(disable: 4996 6385 6011 4267 4244 4013 4312 4005 6387 26451)
 
-extern int columna;
 extern FILE *yyin;
-
 extern int yylex(void);
-extern int yyerror(char *s);
-
+int yyerror(const char *s);
 
 
 /* Enabling traces.  */
@@ -123,13 +120,13 @@ extern int yyerror(char *s);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union
-#line 15 "parser.y"
+#line 12 "parser.y"
 YYSTYPE {
     char *cadena;
     int numero;
 }
 /* Line 193 of yacc.c.  */
-#line 133 "parser.tab.c"
+#line 130 "parser.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -142,7 +139,7 @@ YYSTYPE {
 
 
 /* Line 216 of yacc.c.  */
-#line 146 "parser.tab.c"
+#line 143 "parser.tab.c"
 
 #ifdef short
 # undef short
@@ -431,7 +428,7 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    22,    22
+       0,    19,    19
 };
 #endif
 
@@ -1350,7 +1347,7 @@ yyreduce:
     {
       
 /* Line 1267 of yacc.c.  */
-#line 1354 "parser.tab.c"
+#line 1351 "parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1564,8 +1561,14 @@ yyreturn:
 }
 
 
-#line 541 "parser.y"
+#line 538 "parser.y"
 
+
+int yyerror(const char *s) 
+{
+   printf("Error %s\n", s);
+   return 0;
+}
 
 int main(int argc, char* argv[])
 {

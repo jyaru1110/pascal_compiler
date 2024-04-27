@@ -64,7 +64,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union
-#line 15 "parser.y"
+#line 12 "parser.y"
 YYSTYPE {
     char *cadena;
     int numero;

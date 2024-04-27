@@ -1,13 +1,8 @@
 %{ 
 #include <stdio.h>
-#include <iostream>
-#include <unordered_map> 
-#include <string>
-#include <fstream>
 #include "parser.tab.h"
+extern int yyerror(const char *s);
 #pragma warning(disable: 4996 6385 6011 4267 4244 4013 4312 4005 6387 26451)
-
-using namespace std;
 %}
 
 INCIO_COMENTARIO \{|(\(\*)
@@ -33,6 +28,8 @@ LINEA [\n]
 TABULADOR [\t]
 ESPACIO [" "]
 ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
+
+
 
 %s comentario
 
@@ -62,7 +59,7 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 }
 
 {IDENTIFICADOR} {
-	return identifier
+	return identifier;
 }
 
 {ESPACIO} {
@@ -91,7 +88,7 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 }
 
 . {
-	return *yytext;
+	yyerror("Caracter no valido");
 }
 
 

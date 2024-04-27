@@ -4,12 +4,9 @@
 #include <stdio.h>
 #pragma warning(disable: 4996 6385 6011 4267 4244 4013 4312 4005 6387 26451)
 
-extern int columna;
 extern FILE *yyin;
-
 extern int yylex(void);
-extern int yyerror(char *s);
-
+int yyerror(const char *s);
 %}
 
 %union YYSTYPE {
@@ -539,6 +536,12 @@ optionalunitprocedureandfunctiondeclarationpart: procedureandfunctiondeclaration
 ;
 
 %%
+
+int yyerror(const char *s) 
+{
+   printf("Error %s\n", s);
+   return 0;
+}
 
 int main(int argc, char* argv[])
 {
