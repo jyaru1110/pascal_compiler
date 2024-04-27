@@ -36,7 +36,7 @@ typeidentifier: identifier
 
 structuredtypeidentifier: identifier
     ;
-    
+
 pointertypeidentifier: identifier
     ;
 
@@ -136,7 +136,7 @@ stringtype: 'string' '[' sizeattribute ']'
     | stringtypeidentifier
     ;
 
-stringtypeidentifier: 'string'
+stringtypeidentifier: identifier
     ;
 
 
