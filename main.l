@@ -41,6 +41,24 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 
 %%
 
+{DIGIT} {
+	return digitsequence;
+}
+
+{REAL_SIN_SIGNO} {
+	return constantidentifier;
+}
+
+{NUMERO_SIN_SIGNO} {
+	return unsignednumber;
+}
+
+
+
+{NUMERO_CON_SIGNO} {
+	return signednumber;
+}
+
 {PALABRAS_RESERVADAS} {
 	return *yytext;
 }
@@ -58,10 +76,6 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 {TABULADOR} 	{
 		}
 
-{ELEMENTOS}	{
-		}
-
-
 {INCIO_COMENTARIO} BEGIN(comentario);
 
 <comentario>{FIN_COMENTARIO} {
@@ -72,10 +86,6 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 }
 
 {SIMBOLOS_ESCRITURA} {
-
-}
-
-{NUMERO_CON_SIGNO} {
 
 }
 
