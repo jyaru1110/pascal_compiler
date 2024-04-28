@@ -80,6 +80,8 @@ int yyerror(const char *s);
 
 %%
 
+s: program | regularunit
+
 program: programheading ';' optionalprogramuseclause block
 ;
 
