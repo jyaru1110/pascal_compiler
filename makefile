@@ -1,5 +1,5 @@
 compila_pascal: main.l parser.y
 	flex -L main.l
-	bison -dt parser.y
+	bison -dtv parser.y
 	gcc parser.tab.c lex.yy.c
-	./a.out "Hello.pas"
+	./a.out "CRTDEMO.PAS"

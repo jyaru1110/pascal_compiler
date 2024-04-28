@@ -3,6 +3,7 @@
 #include "parser.tab.h"
 extern int yyerror(const char *s);
 #pragma warning(disable: 4996 6385 6011 4267 4244 4013 4312 4005 6387 26451)
+int linea=1;
 %}
 
 INCIO_COMENTARIO \{|(\(\*)
@@ -14,6 +15,8 @@ SIMBOLOS_ESCRITURA \@|\#|\+|\-|\*|\/|\<|\>|\^|\;|\=|\,|\(|\)|\[|\]|\:
 IDENTIFICADOR [a-zA-Z][a-zA-Z0-9_]*
 
 ORDINAL_TYPE_IDENTIFIER (integer)|(char)|(boolean)|(longint)
+
+ANYCHARBUTCOMILLA [^\']+
 
 DIGIT [0-9]+
 DIGITOS_HEX [0-9a-fA-F]+
@@ -120,17 +123,11 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 	return identifier;
 }
 
-{ESPACIO} {
-	return space;
-}
-
-{LINEA} 	{
-	return newline;
+{LINEA} {
+	linea++;
 		}
 
-{TABULADOR} 	{
-	return tab;
-		}
+[ \t] ;
 
 {INCIO_COMENTARIO} BEGIN(comentario);
 
@@ -143,18 +140,13 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 
 {SIMBOLOS_ESCRITURA} {
 	return *yytext;
-
 }
 
 "<>"|"<="|">=" { return comparison_op; }
 ":=" { return assignment_op; }
 ".." { return range_op; }
 
-{CONSTANTE_CADENA} {
-}
-
 . {
-	printf("Caracter no valido: %s\n", yytext);
 	yyerror("Caracter no valido");
 }
 

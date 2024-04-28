@@ -4,10 +4,7 @@
 %token digitsequence 
 %token constantidentifier 
 %token unsignednumber 
-%token ordinaltypeidentifier 
-%token space 
-%token newline 
-%token tab 
+%token ordinaltypeidentifier
 %token comilla
 %token tk_program
 %token tk_begin
@@ -66,10 +63,13 @@
 
 %{
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #pragma warning(disable: 4996 6385 6011 4267 4244 4013 4312 4005 6387 26451)
 
 extern FILE *yyin;
 extern int yylex(void);
+extern int linea;
 int yyerror(const char *s);
 %}
 
@@ -80,7 +80,7 @@ int yyerror(const char *s);
 
 %%
 
-s: program | regularunit
+s: program | regularunit;
 
 program: programheading ';' optionalprogramuseclause block
 ;
@@ -96,6 +96,10 @@ functionidentifier: identifier
     ;
 
 procedureidentifier: identifier
+    | tk_read
+    | tk_readln
+    | tk_write
+    | tk_writeln
     ;
 
 typeidentifier: identifier
@@ -364,7 +368,7 @@ unsignedexpression: term '+' unsignedexpression
 
 expression: simpleexpression comparison_op simpleexpression
     | simpleexpression '=' simpleexpression
-    | simpleexpression 'in' simpleexpression
+    | simpleexpression tk_in simpleexpression
     | simpleexpression '>' simpleexpression
     | simpleexpression '<' simpleexpression
     | simpleexpression
@@ -378,13 +382,14 @@ actualparameterlist: '(' actualparametergroup ')'
     ;
 
 actualparametergroup: actualparameter
-    | actualparameter ',' actualparametergroup
+    | actualparametergroup ',' actualparameter
     ;
 
 actualparameter: expression 
     | variablereference
     | procedureidentifier
     | functionidentifier
+    | quotedstringconstant
     ;
 
 setconstructor: '[' membergroups ']'
@@ -429,9 +434,9 @@ structuredstatement: compoundstatement
 
 compoundstatement: tk_begin statements tk_end;
 
-statements: statement
-    |statement ';' statements
-    ;
+statements : statement
+           | statements ';' statement
+           ;
 
 conditionalstatement: ifstatement
     | casestatement
@@ -594,18 +599,28 @@ optionalunitprocedureandfunctiondeclarationpart: procedureandfunctiondeclaration
 
 int yyerror(const char *s) 
 {
-   printf('Error %s\n', s);
-   return 0;
+   char mensaje[100];
+
+   if ( !strcmp( s, "parse error" ) )
+      strcpy( mensaje, "Error de sintaxis" );
+   else
+      strcpy( mensaje, s );
+
+   printf("Error en linea %d: %s\n", linea, mensaje);
+   return 1;
+
 }
 
-int main(int argc, char* argv[])
-{
-	if ( argc > 0 ){
-      yyin = fopen( argv[0], 'r' );
+int main(int argc, char* argv[]) {
+	if ( argc > 1 ){
+        printf("Archivo: %s\n", argv[1]);
+        yyin = fopen( argv[1], "r" );
     }
             
-    else
-            yyin = stdin;
+    else{
+        printf("Archivo: stdin\n");
+        yyin = stdin;
+    }
 
     yyparse();
 	return 0;
