@@ -64,7 +64,6 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 	return signednumber;
 }
 
-/* Palabras reservadas */
 "program" { return tk_program; }
 "begin" { return tk_begin; }
 "uses" { return tk_uses; }
