@@ -87,7 +87,7 @@ program: programheading ';' optionalprogramuseclause block
 label: digitsequence
     ;
 
-quotedstringconstant:comillas stringcharacter comillas
+quotedstringconstant:comilla stringcharacter comilla
     ;
 
 functionidentifier: identifier
@@ -116,7 +116,8 @@ constantdeclaration: identifier '=' constant ';'
     ;
 
 constant: identifier
-    | sign constantidentifier
+    | '+' constantidentifier
+    | '-' constantidentifier
     | signednumber
     | quotedstringconstant
     | quotedcharacterconstant
@@ -200,7 +201,7 @@ stringtypeidentifier: identifier
     ;
 
 
-sizeattribute: unsignedinteger
+sizeattribute: unsignednumber
     ;
 
 enumeratedtype: '(' identifierlist ')'
@@ -291,17 +292,9 @@ variablereference: variableidentifier
     | variableidentifier qualifiers
     ;
 
-
-
 identifierlist:
     identifier
     | identifier ',' identifierlist
-    ;
-
-variabledeclaration: identifierlist ':' type ';'
-    ;
-
-variablereference: variableidentifier qualifiers
     ;
 
 qualifiers : qualifier
@@ -356,7 +349,8 @@ term: factor
     | factor tk_and term
     ;
 
-simpleexpression: sign unsignedexpression
+simpleexpression: '+' unsignedexpression
+    | '-' unsignedexpression
     | unsignedexpression
     ;
 
@@ -366,7 +360,11 @@ unsignedexpression: term '+' unsignedexpression
     | term
     ;
 
-expression: simpleexpression simpleexpressionoperands simpleexpression
+expression: simpleexpression comparison_op simpleexpression
+    | simpleexpression '=' simpleexpression
+    | simpleexpression 'in' simpleexpression
+    | simpleexpression '>' simpleexpression
+    | simpleexpression '<' simpleexpression
     | simpleexpression
     ;
 
@@ -378,7 +376,7 @@ actualparameterlist: '(' actualparametergroup ')'
     ;
 
 actualparametergroup: actualparameter
-    | actualparametergroup ','
+    | actualparameter ',' actualparametergroup
     ;
 
 actualparameter: expression 
@@ -388,10 +386,11 @@ actualparameter: expression
     ;
 
 setconstructor: '[' membergroups ']'
+    | '[' ']'
     ;
 
 membergroups: membergroup
-    | membergroups ','
+    | membergroup ',' membergroups
     ;
 membergroup: expression
     | expression range_op expression
@@ -429,7 +428,7 @@ structuredstatement: compoundstatement
 compoundstatement: tk_begin statements tk_end;
 
 statements: statement
-    |statements ';'
+    |statement ';' statements
     ;
 
 conditionalstatement: ifstatement
@@ -446,13 +445,13 @@ casestatement: tk_case expression tk_of cases tk_end
     | tk_case expression tk_of cases otherwiseclause ';' tk_end
     ;
 
-cases: cases ','
+cases: case ',' cases
     | case
     ;
 
 case: constants ':' statement;
 
-constants: constants constant
+constants: constant ',' constants
     | constant
     ;
 
@@ -487,7 +486,7 @@ withstatement: tk_with recordvariablereferences tk_do statement
     ;
 
 recordvariablereferences: recordvariablereference
-    | recordvariablereferences ','
+    | recordvariablereference ',' recordvariablereferences
     ;
 
 recordvariablereference: variablereference
