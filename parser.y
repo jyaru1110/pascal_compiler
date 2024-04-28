@@ -1,4 +1,68 @@
-%token identifier anychar sign signednumber digitsequence constantidentifier unsignedinteger unsignednumber ordinaltypeidentifier simpleexpressionoperands space newline tab comilla
+%token identifier 
+%token anychar 
+%token signednumber 
+%token digitsequence 
+%token constantidentifier 
+%token unsignednumber 
+%token ordinaltypeidentifier 
+%token space 
+%token newline 
+%token tab 
+%token comilla
+%token tk_program
+%token tk_begin
+%token tk_uses
+%token tk_unit
+%token tk_interface
+%token tk_implementation
+%token tk_label
+%token tk_const
+%token tk_type
+%token tk_real
+%token tk_word
+%token tk_true
+%token tk_false
+%token tk_string
+%token tk_packed
+%token tk_array
+%token tk_record
+%token tk_end
+%token tk_case
+%token tk_otherwise
+%token tk_of
+%token tk_set
+%token tk_var
+%token tk_forward
+%token tk_external
+%token tk_function
+%token tk_procedure
+%token tk_file
+%token tk_goto
+%token tk_if
+%token tk_then
+%token tk_else
+%token tk_repeat
+%token tk_until
+%token tk_while
+%token tk_do
+%token tk_for
+%token tk_to
+%token tk_downto
+%token tk_with
+%token tk_nil
+%token tk_read
+%token tk_readln
+%token tk_write
+%token tk_writeln
+%token tk_in
+%token tk_or
+%token tk_div
+%token tk_mod
+%token tk_and
+%token tk_not
+%token comparison_op
+%token assignment_op
+%token range_op
 
 %{
 #include <stdio.h>
@@ -66,28 +130,28 @@ block: statementpart
     | labeldeclarationpart
     ;
 
-labeldeclarationpart: 'label' labels ';'
+labeldeclarationpart: tk_label labels ';'
     ;
 
 labels: label
     | label ',' labels
     ;
 
-constantdeclarationpart: 'const' constantdeclarations
+constantdeclarationpart: tk_const constantdeclarations
     ;
 
 constantdeclarations: constantdeclaration
     | constantdeclaration constantdeclarations
     ;
 
-typedeclarationpart: 'type' typedeclarations
+typedeclarationpart: tk_type typedeclarations
     ;
 
 typedeclarations: typedeclaration
     | typedeclaration typedeclarations
     ;
 
-variabledeclarationpart: 'var' variabledeclarations
+variabledeclarationpart: tk_var variabledeclarations
     ;
 
 variabledeclarations: variabledeclaration
@@ -97,7 +161,8 @@ variabledeclarations: variabledeclaration
 procedureandfunctiondeclarationpart: proceduredeclaration
     |functiondeclaration 
     |procedureandfunctiondeclarationpart functiondeclaration
-    |procedureandfunctiondeclarationpart proceduredeclaration ;
+    |procedureandfunctiondeclarationpart proceduredeclaration 
+;
 
 
 statementpart: compoundstatement
@@ -119,7 +184,7 @@ simpletype: ordinaltype
 realtype: realtypeidentifier
     ;
 
-realtypeidentifier: 'real'
+realtypeidentifier: tk_real
     ;
 
 ordinaltype: subrangetype
@@ -127,7 +192,7 @@ ordinaltype: subrangetype
     | ordinaltypeidentifier
     ;
 
-stringtype: 'string' '[' sizeattribute ']'
+stringtype: tk_string '[' sizeattribute ']'
     | stringtypeidentifier
     ;
 
@@ -141,21 +206,21 @@ sizeattribute: unsignedinteger
 enumeratedtype: '(' identifierlist ')'
     ;
 
-subrangetype: constant '..' constant
+subrangetype: constant range_op constant
     ;
 
 structuredtype: arraytype
     | settype
     | filetype
     | recordtype
-    | 'packed' arraytype
-    | 'packed' settype
-    | 'packed' filetype
-    | 'packed' recordtype
+    | tk_packed arraytype
+    | tk_packed settype
+    | tk_packed filetype
+    | tk_packed recordtype
     | structuredtypeidentifier
     ;
 
-arraytype: 'array' '[' indextypes ']' 'of' type
+arraytype: tk_array '[' indextypes ']' tk_of type
     ;
 
 indextypes: indextype
@@ -165,8 +230,8 @@ indextypes: indextype
 indextype: ordinaltype
     ;
 
-recordtype: 'record' 'end'
-    | 'record' fieldlist 'end'
+recordtype: tk_record tk_end
+    | tk_record fieldlist tk_end
     ;
 
 fieldlist: fixedpart
@@ -186,8 +251,8 @@ fielddeclarations: fielddeclaration
 fielddeclaration: identifierlist ':' type
     ;
 
-variantpart: 'case' tagfieldtype 'of' variants
-    | 'case' identifier ':' tagfieldtype 'of' variants
+variantpart: tk_case tagfieldtype tk_of variants
+    | tk_case identifier ':' tagfieldtype tk_of variants
     ;
 
 variants: variant
@@ -205,11 +270,11 @@ constants: constant
 tagfieldtype: ordinaltypeidentifier
     ;
 
-settype: 'set' 'of' ordinaltype
+settype: tk_set tk_of ordinaltype
     ;
 
-filetype: 'file'
-    | 'file' 'of' type
+filetype: tk_file
+    | tk_file tk_of type
     ;
 
 pointertype: '^' basetype
@@ -274,21 +339,21 @@ factor: '@' variablereference
     | functioncall
     | setconstructor
     | '(' expression ')'
-    | 'not' factor
+    | tk_not factor
     ;
 
 unsignedconstant: unsignednumber
     | quotedstringconstant
-    | 'nil'
+    | tk_nil
     | constantidentifier
     ;
 
 term: factor
     | factor '*' term
     | factor '/' term
-    | factor 'div' term
-    | factor 'mod' term
-    | factor 'and' term
+    | factor tk_div term
+    | factor tk_mod term
+    | factor tk_and term
     ;
 
 simpleexpression: sign unsignedexpression
@@ -297,7 +362,7 @@ simpleexpression: sign unsignedexpression
 
 unsignedexpression: term '+' unsignedexpression
     | term '-' unsignedexpression
-    | term 'or' unsignedexpression
+    | term tk_or unsignedexpression
     | term
     ;
 
@@ -329,12 +394,12 @@ membergroups: membergroup
     | membergroups ','
     ;
 membergroup: expression
-    | expression '..' expression
+    | expression range_op expression
     ;
 
-statement: label '..' simplestatement
-    | label '..' structuredstatement
-    | label '..'
+statement: label range_op simplestatement
+    | label range_op structuredstatement
+    | label range_op
     | simplestatement
     | structuredstatement
     |
@@ -345,14 +410,14 @@ simplestatement: assignmentstatement
     | gotostatement
     ;
 
-assignmentstatement: variablereference ':=' expression;
-    | functionidentifier ':=' expression;
+assignmentstatement: variablereference assignment_op expression
+    | functionidentifier assignment_op expression;
 
 procedurestatement: procedureidentifier
     | procedureidentifier actualparameterlist
     ;
 
-gotostatement: 'goto' label
+gotostatement: tk_goto label
     ;
 
 structuredstatement: compoundstatement
@@ -361,7 +426,7 @@ structuredstatement: compoundstatement
     | withstatement
     ;
 
-compoundstatement: 'begin' statements 'end';
+compoundstatement: tk_begin statements tk_end;
 
 statements: statement
     |statements ';'
@@ -371,14 +436,14 @@ conditionalstatement: ifstatement
     | casestatement
     ;
 
-ifstatement: 'if' expression 'then' statement
-    | 'if' expression 'then' statement 'else' statement
+ifstatement: tk_if expression tk_then statement
+    | tk_if expression tk_then statement tk_else statement
     ;
 
-casestatement: 'case' expression 'of' cases 'end'
-    | 'case' expression 'of' cases otherwiseclause 'end' 
-    | 'case' expression 'of' cases ';' 'end' 
-    | 'case' expression 'of' cases otherwiseclause ';' 'end'
+casestatement: tk_case expression tk_of cases tk_end
+    | tk_case expression tk_of cases otherwiseclause tk_end 
+    | tk_case expression tk_of cases ';' tk_end 
+    | tk_case expression tk_of cases otherwiseclause ';' tk_end
     ;
 
 cases: cases ','
@@ -391,7 +456,7 @@ constants: constants constant
     | constant
     ;
 
-otherwiseclause: ';' 'otherwise' statement
+otherwiseclause: ';' tk_otherwise statement
     ;
 
 repetitivestatement: repeatstatement
@@ -399,14 +464,14 @@ repetitivestatement: repeatstatement
     | forstatement
     ;
 
-repeatstatement: 'repeat' statements 'until' expression
+repeatstatement: tk_repeat statements tk_until expression
     ;
 
-whilestatement: 'while' expression 'do' statement
+whilestatement: tk_while expression tk_do statement
     ;
 
-forstatement: 'for' controlvariable ':=' initialvalue 'to' finalvalue 'do' statement
-    | 'for' controlvariable ':=' initialvalue 'downto' finalvalue 'do' statement
+forstatement: tk_for controlvariable assignment_op initialvalue tk_to finalvalue tk_do statement
+    | tk_for controlvariable assignment_op initialvalue tk_downto finalvalue tk_do statement
     ;
 
 controlvariable: variableidentifier
@@ -418,7 +483,7 @@ initialvalue: expression
 finalvalue:expression
     ;
 
-withstatement: 'with' recordvariablereferences 'do' statement
+withstatement: tk_with recordvariablereferences tk_do statement
     ;
 
 recordvariablereferences: recordvariablereference
@@ -432,11 +497,11 @@ proceduredeclaration: procedureheading ';' procedurebody ';'
 ;
 
 procedurebody: block
-  | 'forward'
-  | 'external'
+  | tk_forward
+  | tk_external
 ;
 
-procedureheading: 'procedure' identifier optionalformalparameterlist
+procedureheading: tk_procedure identifier optionalformalparameterlist
 ;
 
 optionalformalparameterlist: formalparameterlist
@@ -447,11 +512,11 @@ functiondeclaration: functionheading ';' functionbody ';'
 ;
 
 functionbody: block
-  | 'forward'
-  | 'external'
+  | tk_forward
+  | tk_external
 ;
 
-functionheading: 'function' identifier optionalformalparameterlist ':' resulttype 
+functionheading: tk_function identifier optionalformalparameterlist ':' resulttype 
 ;
 
 resulttype: ordinaltypeidentifier 
@@ -464,7 +529,7 @@ formalparameter: parameterdeclaration
   | functionheading
 ;
 
-parameterdeclaration: 'var' identifierlist ':' typeidentifier 
+parameterdeclaration: tk_var identifierlist ':' typeidentifier 
   | identifierlist ':' typeidentifier
 ;
 
@@ -479,7 +544,7 @@ optionalprogramuseclause: usesclause ';'
   |
 ;
 
-programheading: 'program' identifier optionalprogramheadingparameters
+programheading: tk_program identifier optionalprogramheadingparameters
 ;
 
 optionalprogramheadingparameters: '(' programparameters ')' 
@@ -489,19 +554,19 @@ optionalprogramheadingparameters: '(' programparameters ')'
 programparameters: identifierlist
 ;
 
-usesclause: 'uses' identifierlist
+usesclause: tk_uses identifierlist
 ;
 
-regularunit: unitheading ';' interfacepart implementationpart 'end' '.'
+regularunit: unitheading ';' interfacepart implementationpart tk_end '.'
 ;
 
-unitheading: 'unit' identifier
+unitheading: tk_unit identifier
 ;
 
-interfacepart: 'interface' optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 ;
 
-implementationpart: 'implementation' optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+implementationpart: tk_implementation optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 ;
 
 optionalunituseclause: usesclause 
