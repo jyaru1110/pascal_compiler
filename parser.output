@@ -17,9 +17,6 @@ Rules never reduced
   161                | functionidentifier
   162                | quotedstringconstant
 
-  201 constants: constant ',' constants
-  202          | constant
-
 
 State 50 conflicts: 17 reduce/reduce
 State 101 conflicts: 7 reduce/reduce
@@ -29,13 +26,11 @@ State 148 conflicts: 30 reduce/reduce
 State 218 conflicts: 2 reduce/reduce
 State 219 conflicts: 2 reduce/reduce
 State 221 conflicts: 2 reduce/reduce
-State 240 conflicts: 3 reduce/reduce
-State 302 conflicts: 1 reduce/reduce
-State 306 conflicts: 1 shift/reduce
-State 332 conflicts: 1 shift/reduce
-State 369 conflicts: 14 reduce/reduce
-State 392 conflicts: 1 reduce/reduce
-State 419 conflicts: 1 shift/reduce
+State 241 conflicts: 3 reduce/reduce
+State 307 conflicts: 1 shift/reduce
+State 333 conflicts: 1 shift/reduce
+State 370 conflicts: 14 reduce/reduce
+State 420 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -312,140 +307,138 @@ Grammar
   186                    | withstatement
 
   187 compoundstatement: tk_begin statements tk_end
+  188                  | tk_begin statements tk_end '.'
 
-  188 statements: statement
-  189           | statements ';' statement
+  189 statements: statement
+  190           | statements ';' statement
 
-  190 conditionalstatement: ifstatement
-  191                     | casestatement
+  191 conditionalstatement: ifstatement
+  192                     | casestatement
 
-  192 ifstatement: tk_if expression tk_then statement
-  193            | tk_if expression tk_then statement tk_else statement
+  193 ifstatement: tk_if expression tk_then statement
+  194            | tk_if expression tk_then statement tk_else statement
 
-  194 casestatement: tk_case expression tk_of cases tk_end
-  195              | tk_case expression tk_of cases otherwiseclause tk_end
-  196              | tk_case expression tk_of cases ';' tk_end
-  197              | tk_case expression tk_of cases otherwiseclause ';' tk_end
+  195 casestatement: tk_case expression tk_of cases tk_end
+  196              | tk_case expression tk_of cases otherwiseclause tk_end
+  197              | tk_case expression tk_of cases ';' tk_end
+  198              | tk_case expression tk_of cases otherwiseclause ';' tk_end
 
-  198 cases: case ',' cases
-  199      | case
+  199 cases: case ',' cases
+  200      | case
 
-  200 case: constants ':' statement
+  201 case: constants ':' statement
 
-  201 constants: constant ',' constants
-  202          | constant
+  202 otherwiseclause: ';' tk_otherwise statement
 
-  203 otherwiseclause: ';' tk_otherwise statement
+  203 repetitivestatement: repeatstatement
+  204                    | whilestatement
+  205                    | forstatement
 
-  204 repetitivestatement: repeatstatement
-  205                    | whilestatement
-  206                    | forstatement
+  206 repeatstatement: tk_repeat statements tk_until expression
 
-  207 repeatstatement: tk_repeat statements tk_until expression
+  207 whilestatement: tk_while expression tk_do statement
 
-  208 whilestatement: tk_while expression tk_do statement
+  208 forstatement: tk_for controlvariable assignment_op initialvalue tk_to finalvalue tk_do statement
+  209             | tk_for controlvariable assignment_op initialvalue tk_downto finalvalue tk_do statement
 
-  209 forstatement: tk_for controlvariable assignment_op initialvalue tk_to finalvalue tk_do statement
-  210             | tk_for controlvariable assignment_op initialvalue tk_downto finalvalue tk_do statement
+  210 controlvariable: variableidentifier
 
-  211 controlvariable: variableidentifier
+  211 initialvalue: expression
 
-  212 initialvalue: expression
+  212 finalvalue: expression
 
-  213 finalvalue: expression
+  213 withstatement: tk_with recordvariablereferences tk_do statement
 
-  214 withstatement: tk_with recordvariablereferences tk_do statement
+  214 recordvariablereferences: recordvariablereference
+  215                         | recordvariablereference ',' recordvariablereferences
 
-  215 recordvariablereferences: recordvariablereference
-  216                         | recordvariablereference ',' recordvariablereferences
+  216 recordvariablereference: variablereference
 
-  217 recordvariablereference: variablereference
+  217 proceduredeclaration: procedureheading ';' procedurebody ';'
 
-  218 proceduredeclaration: procedureheading ';' procedurebody ';'
+  218 procedurebody: block
+  219              | tk_forward
+  220              | tk_external
 
-  219 procedurebody: block
-  220              | tk_forward
-  221              | tk_external
+  221 procedureheading: tk_procedure identifier optionalformalparameterlist
 
-  222 procedureheading: tk_procedure identifier optionalformalparameterlist
+  222 optionalformalparameterlist: formalparameterlist
+  223                            | /* empty */
 
-  223 optionalformalparameterlist: formalparameterlist
-  224                            | /* empty */
+  224 functiondeclaration: functionheading ';' functionbody ';'
 
-  225 functiondeclaration: functionheading ';' functionbody ';'
+  225 functionbody: block
+  226             | tk_forward
+  227             | tk_external
 
-  226 functionbody: block
-  227             | tk_forward
-  228             | tk_external
+  228 functionheading: tk_function identifier optionalformalparameterlist ':' resulttype
 
-  229 functionheading: tk_function identifier optionalformalparameterlist ':' resulttype
+  229 resulttype: ordinaltypeidentifier
+  230           | realtypeidentifier
+  231           | pointertypeidentifier
 
-  230 resulttype: ordinaltypeidentifier
-  231           | realtypeidentifier
-  232           | pointertypeidentifier
+  232 formalparameter: parameterdeclaration
+  233                | procedureheading
+  234                | functionheading
 
-  233 formalparameter: parameterdeclaration
-  234                | procedureheading
-  235                | functionheading
+  235 parameterdeclaration: tk_var identifierlist ':' typeidentifier
+  236                     | identifierlist ':' typeidentifier
 
-  236 parameterdeclaration: tk_var identifierlist ':' typeidentifier
-  237                     | identifierlist ':' typeidentifier
+  237 formalparameters: formalparameter ';' formalparameters
+  238                 | formalparameter
 
-  238 formalparameters: formalparameter ';' formalparameters
-  239                 | formalparameter
+  239 formalparameterlist: '(' formalparameters ')'
 
-  240 formalparameterlist: '(' formalparameters ')'
+  240 optionalprogramuseclause: usesclause ';'
+  241                         | /* empty */
 
-  241 optionalprogramuseclause: usesclause ';'
-  242                         | /* empty */
+  242 programheading: tk_program identifier optionalprogramheadingparameters
 
-  243 programheading: tk_program identifier optionalprogramheadingparameters
+  243 optionalprogramheadingparameters: '(' programparameters ')'
+  244                                 | /* empty */
 
-  244 optionalprogramheadingparameters: '(' programparameters ')'
-  245                                 | /* empty */
+  245 programparameters: identifierlist
 
-  246 programparameters: identifierlist
+  246 usesclause: tk_uses identifierlist
 
-  247 usesclause: tk_uses identifierlist
+  247 regularunit: unitheading ';' interfacepart implementationpart tk_end '.'
 
-  248 regularunit: unitheading ';' interfacepart implementationpart tk_end '.'
+  248 unitheading: tk_unit identifier
 
-  249 unitheading: tk_unit identifier
+  249 interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 
-  250 interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+  250 implementationpart: tk_implementation optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 
-  251 implementationpart: tk_implementation optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+  251 optionalunituseclause: usesclause
+  252                      | /* empty */
 
-  252 optionalunituseclause: usesclause
-  253                      | /* empty */
+  253 optionalunitconstantdeclarationpart: constantdeclarationpart
+  254                                    | /* empty */
 
-  254 optionalunitconstantdeclarationpart: constantdeclarationpart
-  255                                    | /* empty */
+  255 optionalunittypedeclarationpart: typedeclarationpart
+  256                                | /* empty */
 
-  256 optionalunittypedeclarationpart: typedeclarationpart
-  257                                | /* empty */
+  257 optionalunitvariabledeclarationpart: variabledeclarationpart
+  258                                    | /* empty */
 
-  258 optionalunitvariabledeclarationpart: variabledeclarationpart
-  259                                    | /* empty */
-
-  260 optionalunitprocedureandfunctiondeclarationpart: procedureandfunctiondeclarationpart
-  261                                                | /* empty */
+  259 optionalunitprocedureandfunctiondeclarationpart: procedureandfunctiondeclarationpart
+  260                                                | /* empty */
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'(' (40) 64 94 95 128 155 240 244
-')' (41) 64 94 95 128 155 240 244
+'(' (40) 64 94 95 128 155 239 243
+')' (41) 64 94 95 128 155 239 243
 '*' (42) 135
 '+' (43) 20 140 143
-',' (44) 33 97 109 119 157 166 198 201 216
+',' (44) 33 97 109 119 157 166 199 215
 '-' (45) 21 141 144
-'.' (46) 120 248
+'.' (46) 120 188 247
 '/' (47) 136
-':' (58) 89 91 94 95 105 200 229 236 237
-';' (59) 3 18 31 48 82 83 85 88 93 105 189 196 197 203 218 225 238
-    241 248
+':' (58) 89 91 94 95 105 201 228 235 236
+';' (59) 3 18 31 48 82 83 85 88 93 105 190 197 198 202 217 224 237
+    240 247
 '<' (60) 151
 '=' (61) 18 48 148
 '>' (62) 150
@@ -454,21 +447,21 @@ $end (0) 0
 ']' (93) 60 75 117 163 164
 '^' (94) 102 121 122
 error (256)
-identifier (258) 6 7 12 13 14 18 19 48 62 91 108 109 112 120 222 229
-    243 249
+identifier (258) 6 7 12 13 14 18 19 48 62 91 108 109 112 120 221 228
+    242 248
 anychar (259) 15
 signednumber (260) 22
 digitsequence (261) 4
 constantidentifier (262) 20 21 133
 unsignednumber (263) 63 130
-ordinaltypeidentifier (264) 59 98 230
+ordinaltypeidentifier (264) 59 98 229
 comilla (265) 5 16 17
-tk_program (266) 243
-tk_begin (267) 187
-tk_uses (268) 247
-tk_unit (269) 249
-tk_interface (270) 250
-tk_implementation (271) 251
+tk_program (266) 242
+tk_begin (267) 187 188
+tk_uses (268) 246
+tk_unit (269) 248
+tk_interface (270) 249
+tk_implementation (271) 250
 tk_label (272) 31
 tk_const (273) 34
 tk_type (274) 37
@@ -480,29 +473,29 @@ tk_string (279) 60
 tk_packed (280) 70 71 72 73
 tk_array (281) 75
 tk_record (282) 79 80
-tk_end (283) 79 80 187 194 195 196 197 248
-tk_case (284) 90 91 194 195 196 197
-tk_otherwise (285) 203
-tk_of (286) 75 90 91 99 101 194 195 196 197
+tk_end (283) 79 80 187 188 195 196 197 198 247
+tk_case (284) 90 91 195 196 197 198
+tk_otherwise (285) 202
+tk_of (286) 75 90 91 99 101 195 196 197 198
 tk_set (287) 99
-tk_var (288) 40 236
-tk_forward (289) 220 227
-tk_external (290) 221 228
-tk_function (291) 229
-tk_procedure (292) 222
+tk_var (288) 40 235
+tk_forward (289) 219 226
+tk_external (290) 220 227
+tk_function (291) 228
+tk_procedure (292) 221
 tk_file (293) 100 101
 tk_goto (294) 182
-tk_if (295) 192 193
-tk_then (296) 192 193
-tk_else (297) 193
-tk_repeat (298) 207
-tk_until (299) 207
-tk_while (300) 208
-tk_do (301) 208 209 210 214
-tk_for (302) 209 210
-tk_to (303) 209
-tk_downto (304) 210
-tk_with (305) 214
+tk_if (295) 193 194
+tk_then (296) 193 194
+tk_else (297) 194
+tk_repeat (298) 206
+tk_until (299) 206
+tk_while (300) 207
+tk_do (301) 207 208 209 213
+tk_for (302) 208 209
+tk_to (303) 208
+tk_downto (304) 209
+tk_with (305) 213
 tk_nil (306) 132
 tk_read (307) 8
 tk_readln (308) 9
@@ -515,7 +508,7 @@ tk_mod (314) 138
 tk_and (315) 139
 tk_not (316) 129
 comparison_op (317) 147
-assignment_op (318) 178 179 209 210
+assignment_op (318) 178 179 208 209
 range_op (319) 65 168 169 170 171
 
 
@@ -536,11 +529,11 @@ functionidentifier (87)
 procedureidentifier (88)
     on left: 7 8 9 10 11, on right: 160 180 181
 typeidentifier (89)
-    on left: 12, on right: 104 236 237
+    on left: 12, on right: 104 235 236
 structuredtypeidentifier (90)
     on left: 13, on right: 74
 pointertypeidentifier (91)
-    on left: 14, on right: 103 232
+    on left: 14, on right: 103 231
 stringcharacter (92)
     on left: 15 16, on right: 5 17
 quotedcharacterconstant (93)
@@ -548,27 +541,27 @@ quotedcharacterconstant (93)
 constantdeclaration (94)
     on left: 18, on right: 35 36
 constant (95)
-    on left: 19 20 21 22 23 24, on right: 18 65 96 97 201 202
+    on left: 19 20 21 22 23 24, on right: 18 65 96 97
 block (96)
-    on left: 25 26 27 28 29 30, on right: 3 26 27 28 29 219 226
+    on left: 25 26 27 28 29 30, on right: 3 26 27 28 29 218 225
 labeldeclarationpart (97)
     on left: 31, on right: 30
 labels (98)
     on left: 32 33, on right: 31 33
 constantdeclarationpart (99)
-    on left: 34, on right: 29 254
+    on left: 34, on right: 29 253
 constantdeclarations (100)
     on left: 35 36, on right: 34 36
 typedeclarationpart (101)
-    on left: 37, on right: 28 256
+    on left: 37, on right: 28 255
 typedeclarations (102)
     on left: 38 39, on right: 37 39
 variabledeclarationpart (103)
-    on left: 40, on right: 27 258
+    on left: 40, on right: 27 257
 variabledeclarations (104)
     on left: 41 42, on right: 40 42
 procedureandfunctiondeclarationpart (105)
-    on left: 43 44 45 46, on right: 26 45 46 260
+    on left: 43 44 45 46, on right: 26 45 46 259
 statementpart (106)
     on left: 47, on right: 25
 typedeclaration (107)
@@ -580,7 +573,7 @@ simpletype (109)
 realtype (110)
     on left: 55, on right: 53
 realtypeidentifier (111)
-    on left: 56, on right: 55 231
+    on left: 56, on right: 55 230
 ordinaltype (112)
     on left: 57 58 59, on right: 52 78 99
 stringtype (113)
@@ -618,7 +611,7 @@ variants (128)
 variant (129)
     on left: 94 95, on right: 92 93
 constants (130)
-    on left: 96 97 201 202, on right: 94 95 97 200 201
+    on left: 96 97, on right: 94 95 97 201
 tagfieldtype (131)
     on left: 98, on right: 90 91
 settype (132)
@@ -632,13 +625,13 @@ basetype (135)
 variabledeclaration (136)
     on left: 105, on right: 41 42
 variablereference (137)
-    on left: 106 107, on right: 123 124 159 178 217
+    on left: 106 107, on right: 123 124 159 178 216
 identifierlist (138)
-    on left: 108 109, on right: 64 89 105 109 236 237 246 247
+    on left: 108 109, on right: 64 89 105 109 235 236 245 246
 qualifiers (139)
     on left: 110 111, on right: 107 111
 variableidentifier (140)
-    on left: 112, on right: 106 107 211
+    on left: 112, on right: 106 107 210
 qualifier (141)
     on left: 113 114 115 116, on right: 110 111
 index (142)
@@ -665,7 +658,7 @@ unsignedexpression (151)
     on left: 143 144 145 146, on right: 140 141 142 143 144 145
 expression (152)
     on left: 147 148 149 150 151 152, on right: 118 119 128 158 167
-    168 178 179 192 193 194 195 196 197 207 208 212 213
+    168 178 179 193 194 195 196 197 198 206 207 211 212
 functioncall (153)
     on left: 153 154, on right: 126
 actualparameterlist (154)
@@ -681,8 +674,8 @@ membergroups (158)
 membergroup (159)
     on left: 167 168, on right: 165 166
 statement (160)
-    on left: 169 170 171 172 173 174, on right: 188 189 192 193 200
-    203 208 209 210 214
+    on left: 169 170 171 172 173 174, on right: 189 190 193 194 201
+    202 207 208 209 213
 simplestatement (161)
     on left: 175 176 177, on right: 169 172
 assignmentstatement (162)
@@ -694,93 +687,93 @@ gotostatement (164)
 structuredstatement (165)
     on left: 183 184 185 186, on right: 170 173
 compoundstatement (166)
-    on left: 187, on right: 47 183
+    on left: 187 188, on right: 47 183
 statements (167)
-    on left: 188 189, on right: 187 189 207
+    on left: 189 190, on right: 187 188 190 206
 conditionalstatement (168)
-    on left: 190 191, on right: 184
+    on left: 191 192, on right: 184
 ifstatement (169)
-    on left: 192 193, on right: 190
+    on left: 193 194, on right: 191
 casestatement (170)
-    on left: 194 195 196 197, on right: 191
+    on left: 195 196 197 198, on right: 192
 cases (171)
-    on left: 198 199, on right: 194 195 196 197 198
+    on left: 199 200, on right: 195 196 197 198 199
 case (172)
-    on left: 200, on right: 198 199
+    on left: 201, on right: 199 200
 otherwiseclause (173)
-    on left: 203, on right: 195 197
+    on left: 202, on right: 196 198
 repetitivestatement (174)
-    on left: 204 205 206, on right: 185
+    on left: 203 204 205, on right: 185
 repeatstatement (175)
-    on left: 207, on right: 204
+    on left: 206, on right: 203
 whilestatement (176)
-    on left: 208, on right: 205
+    on left: 207, on right: 204
 forstatement (177)
-    on left: 209 210, on right: 206
+    on left: 208 209, on right: 205
 controlvariable (178)
-    on left: 211, on right: 209 210
+    on left: 210, on right: 208 209
 initialvalue (179)
-    on left: 212, on right: 209 210
+    on left: 211, on right: 208 209
 finalvalue (180)
-    on left: 213, on right: 209 210
+    on left: 212, on right: 208 209
 withstatement (181)
-    on left: 214, on right: 186
+    on left: 213, on right: 186
 recordvariablereferences (182)
-    on left: 215 216, on right: 214 216
+    on left: 214 215, on right: 213 215
 recordvariablereference (183)
-    on left: 217, on right: 215 216
+    on left: 216, on right: 214 215
 proceduredeclaration (184)
-    on left: 218, on right: 43 46
+    on left: 217, on right: 43 46
 procedurebody (185)
-    on left: 219 220 221, on right: 218
+    on left: 218 219 220, on right: 217
 procedureheading (186)
-    on left: 222, on right: 218 234
+    on left: 221, on right: 217 233
 optionalformalparameterlist (187)
-    on left: 223 224, on right: 222 229
+    on left: 222 223, on right: 221 228
 functiondeclaration (188)
-    on left: 225, on right: 44 45
+    on left: 224, on right: 44 45
 functionbody (189)
-    on left: 226 227 228, on right: 225
+    on left: 225 226 227, on right: 224
 functionheading (190)
-    on left: 229, on right: 225 235
+    on left: 228, on right: 224 234
 resulttype (191)
-    on left: 230 231 232, on right: 229
+    on left: 229 230 231, on right: 228
 formalparameter (192)
-    on left: 233 234 235, on right: 238 239
+    on left: 232 233 234, on right: 237 238
 parameterdeclaration (193)
-    on left: 236 237, on right: 233
+    on left: 235 236, on right: 232
 formalparameters (194)
-    on left: 238 239, on right: 238 240
+    on left: 237 238, on right: 237 239
 formalparameterlist (195)
-    on left: 240, on right: 223
+    on left: 239, on right: 222
 optionalprogramuseclause (196)
-    on left: 241 242, on right: 3
+    on left: 240 241, on right: 3
 programheading (197)
-    on left: 243, on right: 3
+    on left: 242, on right: 3
 optionalprogramheadingparameters (198)
-    on left: 244 245, on right: 243
+    on left: 243 244, on right: 242
 programparameters (199)
-    on left: 246, on right: 244
+    on left: 245, on right: 243
 usesclause (200)
-    on left: 247, on right: 241 252
+    on left: 246, on right: 240 251
 regularunit (201)
-    on left: 248, on right: 2
+    on left: 247, on right: 2
 unitheading (202)
-    on left: 249, on right: 248
+    on left: 248, on right: 247
 interfacepart (203)
-    on left: 250, on right: 248
+    on left: 249, on right: 247
 implementationpart (204)
-    on left: 251, on right: 248
+    on left: 250, on right: 247
 optionalunituseclause (205)
-    on left: 252 253, on right: 250
+    on left: 251 252, on right: 249
 optionalunitconstantdeclarationpart (206)
-    on left: 254 255, on right: 250 251
+    on left: 253 254, on right: 249 250
 optionalunittypedeclarationpart (207)
-    on left: 256 257, on right: 250 251
+    on left: 255 256, on right: 249 250
 optionalunitvariabledeclarationpart (208)
-    on left: 258 259, on right: 250 251
+    on left: 257 258, on right: 249 250
 optionalunitprocedureandfunctiondeclarationpart (209)
-    on left: 260 261, on right: 250 251
+    on left: 259 260, on right: 249 250
 
 
 state 0
@@ -799,14 +792,14 @@ state 0
 
 state 1
 
-  243 programheading: tk_program . identifier optionalprogramheadingparameters
+  242 programheading: tk_program . identifier optionalprogramheadingparameters
 
     identifier  shift, and go to state 8
 
 
 state 2
 
-  249 unitheading: tk_unit . identifier
+  248 unitheading: tk_unit . identifier
 
     identifier  shift, and go to state 9
 
@@ -841,27 +834,27 @@ state 6
 
 state 7
 
-  248 regularunit: unitheading . ';' interfacepart implementationpart tk_end '.'
+  247 regularunit: unitheading . ';' interfacepart implementationpart tk_end '.'
 
     ';'  shift, and go to state 12
 
 
 state 8
 
-  243 programheading: tk_program identifier . optionalprogramheadingparameters
+  242 programheading: tk_program identifier . optionalprogramheadingparameters
 
     '('  shift, and go to state 13
 
-    $default  reduce using rule 245 (optionalprogramheadingparameters)
+    $default  reduce using rule 244 (optionalprogramheadingparameters)
 
     optionalprogramheadingparameters  go to state 14
 
 
 state 9
 
-  249 unitheading: tk_unit identifier .
+  248 unitheading: tk_unit identifier .
 
-    $default  reduce using rule 249 (unitheading)
+    $default  reduce using rule 248 (unitheading)
 
 
 state 10
@@ -877,7 +870,7 @@ state 11
 
     tk_uses  shift, and go to state 15
 
-    $default  reduce using rule 242 (optionalprogramuseclause)
+    $default  reduce using rule 241 (optionalprogramuseclause)
 
     optionalprogramuseclause  go to state 16
     usesclause                go to state 17
@@ -885,7 +878,7 @@ state 11
 
 state 12
 
-  248 regularunit: unitheading ';' . interfacepart implementationpart tk_end '.'
+  247 regularunit: unitheading ';' . interfacepart implementationpart tk_end '.'
 
     tk_interface  shift, and go to state 18
 
@@ -894,7 +887,7 @@ state 12
 
 state 13
 
-  244 optionalprogramheadingparameters: '(' . programparameters ')'
+  243 optionalprogramheadingparameters: '(' . programparameters ')'
 
     identifier  shift, and go to state 20
 
@@ -904,14 +897,14 @@ state 13
 
 state 14
 
-  243 programheading: tk_program identifier optionalprogramheadingparameters .
+  242 programheading: tk_program identifier optionalprogramheadingparameters .
 
-    $default  reduce using rule 243 (programheading)
+    $default  reduce using rule 242 (programheading)
 
 
 state 15
 
-  247 usesclause: tk_uses . identifierlist
+  246 usesclause: tk_uses . identifierlist
 
     identifier  shift, and go to state 20
 
@@ -946,18 +939,18 @@ state 16
 
 state 17
 
-  241 optionalprogramuseclause: usesclause . ';'
+  240 optionalprogramuseclause: usesclause . ';'
 
     ';'  shift, and go to state 43
 
 
 state 18
 
-  250 interfacepart: tk_interface . optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+  249 interfacepart: tk_interface . optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 
     tk_uses  shift, and go to state 15
 
-    $default  reduce using rule 253 (optionalunituseclause)
+    $default  reduce using rule 252 (optionalunituseclause)
 
     usesclause             go to state 44
     optionalunituseclause  go to state 45
@@ -965,7 +958,7 @@ state 18
 
 state 19
 
-  248 regularunit: unitheading ';' interfacepart . implementationpart tk_end '.'
+  247 regularunit: unitheading ';' interfacepart . implementationpart tk_end '.'
 
     tk_implementation  shift, and go to state 46
 
@@ -984,28 +977,29 @@ state 20
 
 state 21
 
-  246 programparameters: identifierlist .
+  245 programparameters: identifierlist .
 
-    $default  reduce using rule 246 (programparameters)
+    $default  reduce using rule 245 (programparameters)
 
 
 state 22
 
-  244 optionalprogramheadingparameters: '(' programparameters . ')'
+  243 optionalprogramheadingparameters: '(' programparameters . ')'
 
     ')'  shift, and go to state 49
 
 
 state 23
 
-  247 usesclause: tk_uses identifierlist .
+  246 usesclause: tk_uses identifierlist .
 
-    $default  reduce using rule 247 (usesclause)
+    $default  reduce using rule 246 (usesclause)
 
 
 state 24
 
   187 compoundstatement: tk_begin . statements tk_end
+  188                  | tk_begin . statements tk_end '.'
 
     identifier     shift, and go to state 50
     digitsequence  shift, and go to state 51
@@ -1090,14 +1084,14 @@ state 28
 
 state 29
 
-  229 functionheading: tk_function . identifier optionalformalparameterlist ':' resulttype
+  228 functionheading: tk_function . identifier optionalformalparameterlist ':' resulttype
 
     identifier  shift, and go to state 95
 
 
 state 30
 
-  222 procedureheading: tk_procedure . identifier optionalformalparameterlist
+  221 procedureheading: tk_procedure . identifier optionalformalparameterlist
 
     identifier  shift, and go to state 96
 
@@ -1245,7 +1239,7 @@ state 39
 
 state 40
 
-  218 proceduredeclaration: procedureheading . ';' procedurebody ';'
+  217 proceduredeclaration: procedureheading . ';' procedurebody ';'
 
     ';'  shift, and go to state 103
 
@@ -1259,32 +1253,32 @@ state 41
 
 state 42
 
-  225 functiondeclaration: functionheading . ';' functionbody ';'
+  224 functiondeclaration: functionheading . ';' functionbody ';'
 
     ';'  shift, and go to state 104
 
 
 state 43
 
-  241 optionalprogramuseclause: usesclause ';' .
+  240 optionalprogramuseclause: usesclause ';' .
 
-    $default  reduce using rule 241 (optionalprogramuseclause)
+    $default  reduce using rule 240 (optionalprogramuseclause)
 
 
 state 44
 
-  252 optionalunituseclause: usesclause .
+  251 optionalunituseclause: usesclause .
 
-    $default  reduce using rule 252 (optionalunituseclause)
+    $default  reduce using rule 251 (optionalunituseclause)
 
 
 state 45
 
-  250 interfacepart: tk_interface optionalunituseclause . optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+  249 interfacepart: tk_interface optionalunituseclause . optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 
     tk_const  shift, and go to state 26
 
-    $default  reduce using rule 255 (optionalunitconstantdeclarationpart)
+    $default  reduce using rule 254 (optionalunitconstantdeclarationpart)
 
     constantdeclarationpart              go to state 105
     optionalunitconstantdeclarationpart  go to state 106
@@ -1292,11 +1286,11 @@ state 45
 
 state 46
 
-  251 implementationpart: tk_implementation . optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+  250 implementationpart: tk_implementation . optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 
     tk_const  shift, and go to state 26
 
-    $default  reduce using rule 255 (optionalunitconstantdeclarationpart)
+    $default  reduce using rule 254 (optionalunitconstantdeclarationpart)
 
     constantdeclarationpart              go to state 105
     optionalunitconstantdeclarationpart  go to state 107
@@ -1304,7 +1298,7 @@ state 46
 
 state 47
 
-  248 regularunit: unitheading ';' interfacepart implementationpart . tk_end '.'
+  247 regularunit: unitheading ';' interfacepart implementationpart . tk_end '.'
 
     tk_end  shift, and go to state 108
 
@@ -1320,9 +1314,9 @@ state 48
 
 state 49
 
-  244 optionalprogramheadingparameters: '(' programparameters ')' .
+  243 optionalprogramheadingparameters: '(' programparameters ')' .
 
-    $default  reduce using rule 244 (optionalprogramheadingparameters)
+    $default  reduce using rule 243 (optionalprogramheadingparameters)
 
 
 state 50
@@ -1386,10 +1380,10 @@ state 51
 
 state 52
 
-  194 casestatement: tk_case . expression tk_of cases tk_end
-  195              | tk_case . expression tk_of cases otherwiseclause tk_end
-  196              | tk_case . expression tk_of cases ';' tk_end
-  197              | tk_case . expression tk_of cases otherwiseclause ';' tk_end
+  195 casestatement: tk_case . expression tk_of cases tk_end
+  196              | tk_case . expression tk_of cases otherwiseclause tk_end
+  197              | tk_case . expression tk_of cases ';' tk_end
+  198              | tk_case . expression tk_of cases otherwiseclause ';' tk_end
 
     identifier          shift, and go to state 110
     constantidentifier  shift, and go to state 111
@@ -1428,8 +1422,8 @@ state 53
 
 state 54
 
-  192 ifstatement: tk_if . expression tk_then statement
-  193            | tk_if . expression tk_then statement tk_else statement
+  193 ifstatement: tk_if . expression tk_then statement
+  194            | tk_if . expression tk_then statement tk_else statement
 
     identifier          shift, and go to state 110
     constantidentifier  shift, and go to state 111
@@ -1459,7 +1453,7 @@ state 54
 
 state 55
 
-  207 repeatstatement: tk_repeat . statements tk_until expression
+  206 repeatstatement: tk_repeat . statements tk_until expression
 
     identifier     shift, and go to state 50
     digitsequence  shift, and go to state 51
@@ -1503,7 +1497,7 @@ state 55
 
 state 56
 
-  208 whilestatement: tk_while . expression tk_do statement
+  207 whilestatement: tk_while . expression tk_do statement
 
     identifier          shift, and go to state 110
     constantidentifier  shift, and go to state 111
@@ -1533,8 +1527,8 @@ state 56
 
 state 57
 
-  209 forstatement: tk_for . controlvariable assignment_op initialvalue tk_to finalvalue tk_do statement
-  210             | tk_for . controlvariable assignment_op initialvalue tk_downto finalvalue tk_do statement
+  208 forstatement: tk_for . controlvariable assignment_op initialvalue tk_to finalvalue tk_do statement
+  209             | tk_for . controlvariable assignment_op initialvalue tk_downto finalvalue tk_do statement
 
     identifier  shift, and go to state 136
 
@@ -1544,7 +1538,7 @@ state 57
 
 state 58
 
-  214 withstatement: tk_with . recordvariablereferences tk_do statement
+  213 withstatement: tk_with . recordvariablereferences tk_do statement
 
     identifier  shift, and go to state 136
 
@@ -1638,9 +1632,9 @@ state 67
 
 state 68
 
-  188 statements: statement .
+  189 statements: statement .
 
-    $default  reduce using rule 188 (statements)
+    $default  reduce using rule 189 (statements)
 
 
 state 69
@@ -1688,7 +1682,8 @@ state 74
 state 75
 
   187 compoundstatement: tk_begin statements . tk_end
-  189 statements: statements . ';' statement
+  188                  | tk_begin statements . tk_end '.'
+  190 statements: statements . ';' statement
 
     tk_end  shift, and go to state 156
     ';'     shift, and go to state 157
@@ -1703,16 +1698,16 @@ state 76
 
 state 77
 
-  190 conditionalstatement: ifstatement .
+  191 conditionalstatement: ifstatement .
 
-    $default  reduce using rule 190 (conditionalstatement)
+    $default  reduce using rule 191 (conditionalstatement)
 
 
 state 78
 
-  191 conditionalstatement: casestatement .
+  192 conditionalstatement: casestatement .
 
-    $default  reduce using rule 191 (conditionalstatement)
+    $default  reduce using rule 192 (conditionalstatement)
 
 
 state 79
@@ -1724,23 +1719,23 @@ state 79
 
 state 80
 
-  204 repetitivestatement: repeatstatement .
+  203 repetitivestatement: repeatstatement .
 
-    $default  reduce using rule 204 (repetitivestatement)
+    $default  reduce using rule 203 (repetitivestatement)
 
 
 state 81
 
-  205 repetitivestatement: whilestatement .
+  204 repetitivestatement: whilestatement .
 
-    $default  reduce using rule 205 (repetitivestatement)
+    $default  reduce using rule 204 (repetitivestatement)
 
 
 state 82
 
-  206 repetitivestatement: forstatement .
+  205 repetitivestatement: forstatement .
 
-    $default  reduce using rule 206 (repetitivestatement)
+    $default  reduce using rule 205 (repetitivestatement)
 
 
 state 83
@@ -1851,11 +1846,11 @@ state 94
 
 state 95
 
-  229 functionheading: tk_function identifier . optionalformalparameterlist ':' resulttype
+  228 functionheading: tk_function identifier . optionalformalparameterlist ':' resulttype
 
     '('  shift, and go to state 166
 
-    $default  reduce using rule 224 (optionalformalparameterlist)
+    $default  reduce using rule 223 (optionalformalparameterlist)
 
     optionalformalparameterlist  go to state 167
     formalparameterlist          go to state 168
@@ -1863,11 +1858,11 @@ state 95
 
 state 96
 
-  222 procedureheading: tk_procedure identifier . optionalformalparameterlist
+  221 procedureheading: tk_procedure identifier . optionalformalparameterlist
 
     '('  shift, and go to state 166
 
-    $default  reduce using rule 224 (optionalformalparameterlist)
+    $default  reduce using rule 223 (optionalformalparameterlist)
 
     optionalformalparameterlist  go to state 169
     formalparameterlist          go to state 168
@@ -1947,7 +1942,7 @@ state 102
 
 state 103
 
-  218 proceduredeclaration: procedureheading ';' . procedurebody ';'
+  217 proceduredeclaration: procedureheading ';' . procedurebody ';'
 
     tk_begin      shift, and go to state 24
     tk_label      shift, and go to state 25
@@ -1976,7 +1971,7 @@ state 103
 
 state 104
 
-  225 functiondeclaration: functionheading ';' . functionbody ';'
+  224 functiondeclaration: functionheading ';' . functionbody ';'
 
     tk_begin      shift, and go to state 24
     tk_label      shift, and go to state 25
@@ -2005,18 +2000,18 @@ state 104
 
 state 105
 
-  254 optionalunitconstantdeclarationpart: constantdeclarationpart .
+  253 optionalunitconstantdeclarationpart: constantdeclarationpart .
 
-    $default  reduce using rule 254 (optionalunitconstantdeclarationpart)
+    $default  reduce using rule 253 (optionalunitconstantdeclarationpart)
 
 
 state 106
 
-  250 interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart . optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+  249 interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart . optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 
     tk_type  shift, and go to state 27
 
-    $default  reduce using rule 257 (optionalunittypedeclarationpart)
+    $default  reduce using rule 256 (optionalunittypedeclarationpart)
 
     typedeclarationpart              go to state 178
     optionalunittypedeclarationpart  go to state 179
@@ -2024,11 +2019,11 @@ state 106
 
 state 107
 
-  251 implementationpart: tk_implementation optionalunitconstantdeclarationpart . optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+  250 implementationpart: tk_implementation optionalunitconstantdeclarationpart . optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 
     tk_type  shift, and go to state 27
 
-    $default  reduce using rule 257 (optionalunittypedeclarationpart)
+    $default  reduce using rule 256 (optionalunittypedeclarationpart)
 
     typedeclarationpart              go to state 178
     optionalunittypedeclarationpart  go to state 180
@@ -2036,7 +2031,7 @@ state 107
 
 state 108
 
-  248 regularunit: unitheading ';' interfacepart implementationpart tk_end . '.'
+  247 regularunit: unitheading ';' interfacepart implementationpart tk_end . '.'
 
     '.'  shift, and go to state 181
 
@@ -2384,10 +2379,10 @@ state 128
 
 state 129
 
-  194 casestatement: tk_case expression . tk_of cases tk_end
-  195              | tk_case expression . tk_of cases otherwiseclause tk_end
-  196              | tk_case expression . tk_of cases ';' tk_end
-  197              | tk_case expression . tk_of cases otherwiseclause ';' tk_end
+  195 casestatement: tk_case expression . tk_of cases tk_end
+  196              | tk_case expression . tk_of cases otherwiseclause tk_end
+  197              | tk_case expression . tk_of cases ';' tk_end
+  198              | tk_case expression . tk_of cases otherwiseclause ';' tk_end
 
     tk_of  shift, and go to state 208
 
@@ -2415,16 +2410,16 @@ state 132
 
 state 133
 
-  192 ifstatement: tk_if expression . tk_then statement
-  193            | tk_if expression . tk_then statement tk_else statement
+  193 ifstatement: tk_if expression . tk_then statement
+  194            | tk_if expression . tk_then statement tk_else statement
 
     tk_then  shift, and go to state 209
 
 
 state 134
 
-  189 statements: statements . ';' statement
-  207 repeatstatement: tk_repeat statements . tk_until expression
+  190 statements: statements . ';' statement
+  206 repeatstatement: tk_repeat statements . tk_until expression
 
     tk_until  shift, and go to state 210
     ';'       shift, and go to state 157
@@ -2432,7 +2427,7 @@ state 134
 
 state 135
 
-  208 whilestatement: tk_while expression . tk_do statement
+  207 whilestatement: tk_while expression . tk_do statement
 
     tk_do  shift, and go to state 211
 
@@ -2446,41 +2441,41 @@ state 136
 
 state 137
 
-  211 controlvariable: variableidentifier .
+  210 controlvariable: variableidentifier .
 
-    $default  reduce using rule 211 (controlvariable)
+    $default  reduce using rule 210 (controlvariable)
 
 
 state 138
 
-  209 forstatement: tk_for controlvariable . assignment_op initialvalue tk_to finalvalue tk_do statement
-  210             | tk_for controlvariable . assignment_op initialvalue tk_downto finalvalue tk_do statement
+  208 forstatement: tk_for controlvariable . assignment_op initialvalue tk_to finalvalue tk_do statement
+  209             | tk_for controlvariable . assignment_op initialvalue tk_downto finalvalue tk_do statement
 
     assignment_op  shift, and go to state 212
 
 
 state 139
 
-  217 recordvariablereference: variablereference .
+  216 recordvariablereference: variablereference .
 
-    $default  reduce using rule 217 (recordvariablereference)
+    $default  reduce using rule 216 (recordvariablereference)
 
 
 state 140
 
-  214 withstatement: tk_with recordvariablereferences . tk_do statement
+  213 withstatement: tk_with recordvariablereferences . tk_do statement
 
     tk_do  shift, and go to state 213
 
 
 state 141
 
-  215 recordvariablereferences: recordvariablereference .
-  216                         | recordvariablereference . ',' recordvariablereferences
+  214 recordvariablereferences: recordvariablereference .
+  215                         | recordvariablereference . ',' recordvariablereferences
 
     ','  shift, and go to state 214
 
-    $default  reduce using rule 215 (recordvariablereferences)
+    $default  reduce using rule 214 (recordvariablereferences)
 
 
 state 142
@@ -2792,13 +2787,16 @@ state 155
 state 156
 
   187 compoundstatement: tk_begin statements tk_end .
+  188                  | tk_begin statements tk_end . '.'
+
+    '.'  shift, and go to state 230
 
     $default  reduce using rule 187 (compoundstatement)
 
 
 state 157
 
-  189 statements: statements ';' . statement
+  190 statements: statements ';' . statement
 
     identifier     shift, and go to state 50
     digitsequence  shift, and go to state 51
@@ -2822,7 +2820,7 @@ state 157
     procedureidentifier   go to state 65
     variablereference     go to state 66
     variableidentifier    go to state 67
-    statement             go to state 230
+    statement             go to state 231
     simplestatement       go to state 69
     assignmentstatement   go to state 70
     procedurestatement    go to state 71
@@ -2846,7 +2844,7 @@ state 158
     digitsequence  shift, and go to state 51
 
     label   go to state 84
-    labels  go to state 231
+    labels  go to state 232
 
 
 state 159
@@ -2860,15 +2858,15 @@ state 160
 
    18 constantdeclaration: identifier '=' . constant ';'
 
-    identifier    shift, and go to state 232
-    signednumber  shift, and go to state 233
-    comilla       shift, and go to state 234
-    '+'           shift, and go to state 235
-    '-'           shift, and go to state 236
+    identifier    shift, and go to state 233
+    signednumber  shift, and go to state 234
+    comilla       shift, and go to state 235
+    '+'           shift, and go to state 236
+    '-'           shift, and go to state 237
 
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 239
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 240
 
 
 state 161
@@ -2882,42 +2880,42 @@ state 162
 
    48 typedeclaration: identifier '=' . type ';'
 
-    identifier             shift, and go to state 240
-    signednumber           shift, and go to state 233
-    ordinaltypeidentifier  shift, and go to state 241
-    comilla                shift, and go to state 234
-    tk_real                shift, and go to state 242
-    tk_string              shift, and go to state 243
-    tk_packed              shift, and go to state 244
-    tk_array               shift, and go to state 245
-    tk_record              shift, and go to state 246
-    tk_set                 shift, and go to state 247
-    tk_file                shift, and go to state 248
-    '+'                    shift, and go to state 235
-    '-'                    shift, and go to state 236
-    '('                    shift, and go to state 249
-    '^'                    shift, and go to state 250
+    identifier             shift, and go to state 241
+    signednumber           shift, and go to state 234
+    ordinaltypeidentifier  shift, and go to state 242
+    comilla                shift, and go to state 235
+    tk_real                shift, and go to state 243
+    tk_string              shift, and go to state 244
+    tk_packed              shift, and go to state 245
+    tk_array               shift, and go to state 246
+    tk_record              shift, and go to state 247
+    tk_set                 shift, and go to state 248
+    tk_file                shift, and go to state 249
+    '+'                    shift, and go to state 236
+    '-'                    shift, and go to state 237
+    '('                    shift, and go to state 250
+    '^'                    shift, and go to state 251
 
-    quotedstringconstant      go to state 237
-    structuredtypeidentifier  go to state 251
-    pointertypeidentifier     go to state 252
-    quotedcharacterconstant   go to state 238
-    constant                  go to state 253
-    type                      go to state 254
-    simpletype                go to state 255
-    realtype                  go to state 256
-    realtypeidentifier        go to state 257
-    ordinaltype               go to state 258
-    stringtype                go to state 259
-    stringtypeidentifier      go to state 260
-    enumeratedtype            go to state 261
-    subrangetype              go to state 262
-    structuredtype            go to state 263
-    arraytype                 go to state 264
-    recordtype                go to state 265
-    settype                   go to state 266
-    filetype                  go to state 267
-    pointertype               go to state 268
+    quotedstringconstant      go to state 238
+    structuredtypeidentifier  go to state 252
+    pointertypeidentifier     go to state 253
+    quotedcharacterconstant   go to state 239
+    constant                  go to state 254
+    type                      go to state 255
+    simpletype                go to state 256
+    realtype                  go to state 257
+    realtypeidentifier        go to state 258
+    ordinaltype               go to state 259
+    stringtype                go to state 260
+    stringtypeidentifier      go to state 261
+    enumeratedtype            go to state 262
+    subrangetype              go to state 263
+    structuredtype            go to state 264
+    arraytype                 go to state 265
+    recordtype                go to state 266
+    settype                   go to state 267
+    filetype                  go to state 268
+    pointertype               go to state 269
 
 
 state 163
@@ -2938,174 +2936,174 @@ state 165
 
   105 variabledeclaration: identifierlist ':' . type ';'
 
-    identifier             shift, and go to state 240
-    signednumber           shift, and go to state 233
-    ordinaltypeidentifier  shift, and go to state 241
-    comilla                shift, and go to state 234
-    tk_real                shift, and go to state 242
-    tk_string              shift, and go to state 243
-    tk_packed              shift, and go to state 244
-    tk_array               shift, and go to state 245
-    tk_record              shift, and go to state 246
-    tk_set                 shift, and go to state 247
-    tk_file                shift, and go to state 248
-    '+'                    shift, and go to state 235
-    '-'                    shift, and go to state 236
-    '('                    shift, and go to state 249
-    '^'                    shift, and go to state 250
+    identifier             shift, and go to state 241
+    signednumber           shift, and go to state 234
+    ordinaltypeidentifier  shift, and go to state 242
+    comilla                shift, and go to state 235
+    tk_real                shift, and go to state 243
+    tk_string              shift, and go to state 244
+    tk_packed              shift, and go to state 245
+    tk_array               shift, and go to state 246
+    tk_record              shift, and go to state 247
+    tk_set                 shift, and go to state 248
+    tk_file                shift, and go to state 249
+    '+'                    shift, and go to state 236
+    '-'                    shift, and go to state 237
+    '('                    shift, and go to state 250
+    '^'                    shift, and go to state 251
 
-    quotedstringconstant      go to state 237
-    structuredtypeidentifier  go to state 251
-    pointertypeidentifier     go to state 252
-    quotedcharacterconstant   go to state 238
-    constant                  go to state 253
-    type                      go to state 269
-    simpletype                go to state 255
-    realtype                  go to state 256
-    realtypeidentifier        go to state 257
-    ordinaltype               go to state 258
-    stringtype                go to state 259
-    stringtypeidentifier      go to state 260
-    enumeratedtype            go to state 261
-    subrangetype              go to state 262
-    structuredtype            go to state 263
-    arraytype                 go to state 264
-    recordtype                go to state 265
-    settype                   go to state 266
-    filetype                  go to state 267
-    pointertype               go to state 268
+    quotedstringconstant      go to state 238
+    structuredtypeidentifier  go to state 252
+    pointertypeidentifier     go to state 253
+    quotedcharacterconstant   go to state 239
+    constant                  go to state 254
+    type                      go to state 270
+    simpletype                go to state 256
+    realtype                  go to state 257
+    realtypeidentifier        go to state 258
+    ordinaltype               go to state 259
+    stringtype                go to state 260
+    stringtypeidentifier      go to state 261
+    enumeratedtype            go to state 262
+    subrangetype              go to state 263
+    structuredtype            go to state 264
+    arraytype                 go to state 265
+    recordtype                go to state 266
+    settype                   go to state 267
+    filetype                  go to state 268
+    pointertype               go to state 269
 
 
 state 166
 
-  240 formalparameterlist: '(' . formalparameters ')'
+  239 formalparameterlist: '(' . formalparameters ')'
 
     identifier    shift, and go to state 20
-    tk_var        shift, and go to state 270
+    tk_var        shift, and go to state 271
     tk_function   shift, and go to state 29
     tk_procedure  shift, and go to state 30
 
-    identifierlist        go to state 271
-    procedureheading      go to state 272
-    functionheading       go to state 273
-    formalparameter       go to state 274
-    parameterdeclaration  go to state 275
-    formalparameters      go to state 276
+    identifierlist        go to state 272
+    procedureheading      go to state 273
+    functionheading       go to state 274
+    formalparameter       go to state 275
+    parameterdeclaration  go to state 276
+    formalparameters      go to state 277
 
 
 state 167
 
-  229 functionheading: tk_function identifier optionalformalparameterlist . ':' resulttype
+  228 functionheading: tk_function identifier optionalformalparameterlist . ':' resulttype
 
-    ':'  shift, and go to state 277
+    ':'  shift, and go to state 278
 
 
 state 168
 
-  223 optionalformalparameterlist: formalparameterlist .
+  222 optionalformalparameterlist: formalparameterlist .
 
-    $default  reduce using rule 223 (optionalformalparameterlist)
+    $default  reduce using rule 222 (optionalformalparameterlist)
 
 
 state 169
 
-  222 procedureheading: tk_procedure identifier optionalformalparameterlist .
+  221 procedureheading: tk_procedure identifier optionalformalparameterlist .
 
-    $default  reduce using rule 222 (procedureheading)
+    $default  reduce using rule 221 (procedureheading)
 
 
 state 170
 
-  220 procedurebody: tk_forward .
-
-    $default  reduce using rule 220 (procedurebody)
-
-
-state 171
-
-  221 procedurebody: tk_external .
-
-    $default  reduce using rule 221 (procedurebody)
-
-
-state 172
-
-  219 procedurebody: block .
+  219 procedurebody: tk_forward .
 
     $default  reduce using rule 219 (procedurebody)
 
 
+state 171
+
+  220 procedurebody: tk_external .
+
+    $default  reduce using rule 220 (procedurebody)
+
+
+state 172
+
+  218 procedurebody: block .
+
+    $default  reduce using rule 218 (procedurebody)
+
+
 state 173
 
-  218 proceduredeclaration: procedureheading ';' procedurebody . ';'
-
-    ';'  shift, and go to state 278
-
-
-state 174
-
-  227 functionbody: tk_forward .
-
-    $default  reduce using rule 227 (functionbody)
-
-
-state 175
-
-  228 functionbody: tk_external .
-
-    $default  reduce using rule 228 (functionbody)
-
-
-state 176
-
-  226 functionbody: block .
-
-    $default  reduce using rule 226 (functionbody)
-
-
-state 177
-
-  225 functiondeclaration: functionheading ';' functionbody . ';'
+  217 proceduredeclaration: procedureheading ';' procedurebody . ';'
 
     ';'  shift, and go to state 279
 
 
+state 174
+
+  226 functionbody: tk_forward .
+
+    $default  reduce using rule 226 (functionbody)
+
+
+state 175
+
+  227 functionbody: tk_external .
+
+    $default  reduce using rule 227 (functionbody)
+
+
+state 176
+
+  225 functionbody: block .
+
+    $default  reduce using rule 225 (functionbody)
+
+
+state 177
+
+  224 functiondeclaration: functionheading ';' functionbody . ';'
+
+    ';'  shift, and go to state 280
+
+
 state 178
 
-  256 optionalunittypedeclarationpart: typedeclarationpart .
+  255 optionalunittypedeclarationpart: typedeclarationpart .
 
-    $default  reduce using rule 256 (optionalunittypedeclarationpart)
+    $default  reduce using rule 255 (optionalunittypedeclarationpart)
 
 
 state 179
 
-  250 interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart . optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+  249 interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart . optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 
     tk_var  shift, and go to state 28
 
-    $default  reduce using rule 259 (optionalunitvariabledeclarationpart)
+    $default  reduce using rule 258 (optionalunitvariabledeclarationpart)
 
-    variabledeclarationpart              go to state 280
-    optionalunitvariabledeclarationpart  go to state 281
+    variabledeclarationpart              go to state 281
+    optionalunitvariabledeclarationpart  go to state 282
 
 
 state 180
 
-  251 implementationpart: tk_implementation optionalunitconstantdeclarationpart optionalunittypedeclarationpart . optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
+  250 implementationpart: tk_implementation optionalunitconstantdeclarationpart optionalunittypedeclarationpart . optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart
 
     tk_var  shift, and go to state 28
 
-    $default  reduce using rule 259 (optionalunitvariabledeclarationpart)
+    $default  reduce using rule 258 (optionalunitvariabledeclarationpart)
 
-    variabledeclarationpart              go to state 280
-    optionalunitvariabledeclarationpart  go to state 282
+    variabledeclarationpart              go to state 281
+    optionalunitvariabledeclarationpart  go to state 283
 
 
 state 181
 
-  248 regularunit: unitheading ';' interfacepart implementationpart tk_end '.' .
+  247 regularunit: unitheading ';' interfacepart implementationpart tk_end '.' .
 
-    $default  reduce using rule 248 (regularunit)
+    $default  reduce using rule 247 (regularunit)
 
 
 state 182
@@ -3119,14 +3117,14 @@ state 183
 
    16 stringcharacter: comilla . comilla
 
-    comilla  shift, and go to state 283
+    comilla  shift, and go to state 284
 
 
 state 184
 
     5 quotedstringconstant: comilla stringcharacter . comilla
 
-    comilla  shift, and go to state 284
+    comilla  shift, and go to state 285
 
 
 state 185
@@ -3162,7 +3160,7 @@ state 189
   167 membergroup: expression .
   168            | expression . range_op expression
 
-    range_op  shift, and go to state 285
+    range_op  shift, and go to state 286
 
     $default  reduce using rule 167 (membergroup)
 
@@ -3171,7 +3169,7 @@ state 190
 
   163 setconstructor: '[' membergroups . ']'
 
-    ']'  shift, and go to state 286
+    ']'  shift, and go to state 287
 
 
 state 191
@@ -3179,7 +3177,7 @@ state 191
   165 membergroups: membergroup .
   166             | membergroup . ',' membergroups
 
-    ','  shift, and go to state 287
+    ','  shift, and go to state 288
 
     $default  reduce using rule 165 (membergroups)
 
@@ -3188,7 +3186,7 @@ state 192
 
   128 factor: '(' expression . ')'
 
-    ')'  shift, and go to state 288
+    ')'  shift, and go to state 289
 
 
 state 193
@@ -3225,7 +3223,7 @@ state 195
     variableidentifier    go to state 67
     factor                go to state 124
     unsignedconstant      go to state 125
-    term                  go to state 289
+    term                  go to state 290
     functioncall          go to state 130
     setconstructor        go to state 131
 
@@ -3250,7 +3248,7 @@ state 196
     variableidentifier    go to state 67
     factor                go to state 124
     unsignedconstant      go to state 125
-    term                  go to state 290
+    term                  go to state 291
     functioncall          go to state 130
     setconstructor        go to state 131
 
@@ -3275,7 +3273,7 @@ state 197
     variableidentifier    go to state 67
     factor                go to state 124
     unsignedconstant      go to state 125
-    term                  go to state 291
+    term                  go to state 292
     functioncall          go to state 130
     setconstructor        go to state 131
 
@@ -3300,7 +3298,7 @@ state 198
     variableidentifier    go to state 67
     factor                go to state 124
     unsignedconstant      go to state 125
-    term                  go to state 292
+    term                  go to state 293
     functioncall          go to state 130
     setconstructor        go to state 131
 
@@ -3325,7 +3323,7 @@ state 199
     variableidentifier    go to state 67
     factor                go to state 124
     unsignedconstant      go to state 125
-    term                  go to state 293
+    term                  go to state 294
     functioncall          go to state 130
     setconstructor        go to state 131
 
@@ -3351,7 +3349,7 @@ state 200
     factor                go to state 124
     unsignedconstant      go to state 125
     term                  go to state 126
-    unsignedexpression    go to state 294
+    unsignedexpression    go to state 295
     functioncall          go to state 130
     setconstructor        go to state 131
 
@@ -3377,7 +3375,7 @@ state 201
     factor                go to state 124
     unsignedconstant      go to state 125
     term                  go to state 126
-    unsignedexpression    go to state 295
+    unsignedexpression    go to state 296
     functioncall          go to state 130
     setconstructor        go to state 131
 
@@ -3403,7 +3401,7 @@ state 202
     factor                go to state 124
     unsignedconstant      go to state 125
     term                  go to state 126
-    unsignedexpression    go to state 296
+    unsignedexpression    go to state 297
     functioncall          go to state 130
     setconstructor        go to state 131
 
@@ -3431,7 +3429,7 @@ state 203
     factor                go to state 124
     unsignedconstant      go to state 125
     term                  go to state 126
-    simpleexpression      go to state 297
+    simpleexpression      go to state 298
     unsignedexpression    go to state 128
     functioncall          go to state 130
     setconstructor        go to state 131
@@ -3460,7 +3458,7 @@ state 204
     factor                go to state 124
     unsignedconstant      go to state 125
     term                  go to state 126
-    simpleexpression      go to state 298
+    simpleexpression      go to state 299
     unsignedexpression    go to state 128
     functioncall          go to state 130
     setconstructor        go to state 131
@@ -3489,7 +3487,7 @@ state 205
     factor                go to state 124
     unsignedconstant      go to state 125
     term                  go to state 126
-    simpleexpression      go to state 299
+    simpleexpression      go to state 300
     unsignedexpression    go to state 128
     functioncall          go to state 130
     setconstructor        go to state 131
@@ -3518,7 +3516,7 @@ state 206
     factor                go to state 124
     unsignedconstant      go to state 125
     term                  go to state 126
-    simpleexpression      go to state 300
+    simpleexpression      go to state 301
     unsignedexpression    go to state 128
     functioncall          go to state 130
     setconstructor        go to state 131
@@ -3547,7 +3545,7 @@ state 207
     factor                go to state 124
     unsignedconstant      go to state 125
     term                  go to state 126
-    simpleexpression      go to state 301
+    simpleexpression      go to state 302
     unsignedexpression    go to state 128
     functioncall          go to state 130
     setconstructor        go to state 131
@@ -3555,29 +3553,29 @@ state 207
 
 state 208
 
-  194 casestatement: tk_case expression tk_of . cases tk_end
-  195              | tk_case expression tk_of . cases otherwiseclause tk_end
-  196              | tk_case expression tk_of . cases ';' tk_end
-  197              | tk_case expression tk_of . cases otherwiseclause ';' tk_end
+  195 casestatement: tk_case expression tk_of . cases tk_end
+  196              | tk_case expression tk_of . cases otherwiseclause tk_end
+  197              | tk_case expression tk_of . cases ';' tk_end
+  198              | tk_case expression tk_of . cases otherwiseclause ';' tk_end
 
-    identifier    shift, and go to state 232
-    signednumber  shift, and go to state 233
-    comilla       shift, and go to state 234
-    '+'           shift, and go to state 235
-    '-'           shift, and go to state 236
+    identifier    shift, and go to state 233
+    signednumber  shift, and go to state 234
+    comilla       shift, and go to state 235
+    '+'           shift, and go to state 236
+    '-'           shift, and go to state 237
 
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 302
-    constants                go to state 303
-    cases                    go to state 304
-    case                     go to state 305
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 303
+    constants                go to state 304
+    cases                    go to state 305
+    case                     go to state 306
 
 
 state 209
 
-  192 ifstatement: tk_if expression tk_then . statement
-  193            | tk_if expression tk_then . statement tk_else statement
+  193 ifstatement: tk_if expression tk_then . statement
+  194            | tk_if expression tk_then . statement tk_else statement
 
     identifier     shift, and go to state 50
     digitsequence  shift, and go to state 51
@@ -3601,7 +3599,7 @@ state 209
     procedureidentifier   go to state 65
     variablereference     go to state 66
     variableidentifier    go to state 67
-    statement             go to state 306
+    statement             go to state 307
     simplestatement       go to state 69
     assignmentstatement   go to state 70
     procedurestatement    go to state 71
@@ -3620,7 +3618,7 @@ state 209
 
 state 210
 
-  207 repeatstatement: tk_repeat statements tk_until . expression
+  206 repeatstatement: tk_repeat statements tk_until . expression
 
     identifier          shift, and go to state 110
     constantidentifier  shift, and go to state 111
@@ -3643,14 +3641,14 @@ state 210
     term                  go to state 126
     simpleexpression      go to state 127
     unsignedexpression    go to state 128
-    expression            go to state 307
+    expression            go to state 308
     functioncall          go to state 130
     setconstructor        go to state 131
 
 
 state 211
 
-  208 whilestatement: tk_while expression tk_do . statement
+  207 whilestatement: tk_while expression tk_do . statement
 
     identifier     shift, and go to state 50
     digitsequence  shift, and go to state 51
@@ -3674,7 +3672,7 @@ state 211
     procedureidentifier   go to state 65
     variablereference     go to state 66
     variableidentifier    go to state 67
-    statement             go to state 308
+    statement             go to state 309
     simplestatement       go to state 69
     assignmentstatement   go to state 70
     procedurestatement    go to state 71
@@ -3693,8 +3691,8 @@ state 211
 
 state 212
 
-  209 forstatement: tk_for controlvariable assignment_op . initialvalue tk_to finalvalue tk_do statement
-  210             | tk_for controlvariable assignment_op . initialvalue tk_downto finalvalue tk_do statement
+  208 forstatement: tk_for controlvariable assignment_op . initialvalue tk_to finalvalue tk_do statement
+  209             | tk_for controlvariable assignment_op . initialvalue tk_downto finalvalue tk_do statement
 
     identifier          shift, and go to state 110
     constantidentifier  shift, and go to state 111
@@ -3717,15 +3715,15 @@ state 212
     term                  go to state 126
     simpleexpression      go to state 127
     unsignedexpression    go to state 128
-    expression            go to state 309
+    expression            go to state 310
     functioncall          go to state 130
     setconstructor        go to state 131
-    initialvalue          go to state 310
+    initialvalue          go to state 311
 
 
 state 213
 
-  214 withstatement: tk_with recordvariablereferences tk_do . statement
+  213 withstatement: tk_with recordvariablereferences tk_do . statement
 
     identifier     shift, and go to state 50
     digitsequence  shift, and go to state 51
@@ -3749,7 +3747,7 @@ state 213
     procedureidentifier   go to state 65
     variablereference     go to state 66
     variableidentifier    go to state 67
-    statement             go to state 311
+    statement             go to state 312
     simplestatement       go to state 69
     assignmentstatement   go to state 70
     procedurestatement    go to state 71
@@ -3768,13 +3766,13 @@ state 213
 
 state 214
 
-  216 recordvariablereferences: recordvariablereference ',' . recordvariablereferences
+  215 recordvariablereferences: recordvariablereference ',' . recordvariablereferences
 
     identifier  shift, and go to state 136
 
     variablereference         go to state 139
     variableidentifier        go to state 67
-    recordvariablereferences  go to state 312
+    recordvariablereferences  go to state 313
     recordvariablereference   go to state 141
 
 
@@ -3859,8 +3857,8 @@ state 223
   155 actualparameterlist: '(' actualparametergroup . ')'
   157 actualparametergroup: actualparametergroup . ',' actualparameter
 
-    ','  shift, and go to state 313
-    ')'  shift, and go to state 314
+    ','  shift, and go to state 314
+    ')'  shift, and go to state 315
 
 
 state 224
@@ -3881,7 +3879,7 @@ state 226
 
   117 index: '[' expressions . ']'
 
-    ']'  shift, and go to state 315
+    ']'  shift, and go to state 316
 
 
 state 227
@@ -3889,7 +3887,7 @@ state 227
   118 expressions: expression .
   119            | expression . ',' expressions
 
-    ','  shift, and go to state 316
+    ','  shift, and go to state 317
 
     $default  reduce using rule 118 (expressions)
 
@@ -3910,33 +3908,40 @@ state 229
 
 state 230
 
-  189 statements: statements ';' statement .
+  188 compoundstatement: tk_begin statements tk_end '.' .
 
-    $default  reduce using rule 189 (statements)
+    $default  reduce using rule 188 (compoundstatement)
 
 
 state 231
+
+  190 statements: statements ';' statement .
+
+    $default  reduce using rule 190 (statements)
+
+
+state 232
 
    33 labels: label ',' labels .
 
     $default  reduce using rule 33 (labels)
 
 
-state 232
+state 233
 
    19 constant: identifier .
 
     $default  reduce using rule 19 (constant)
 
 
-state 233
+state 234
 
    22 constant: signednumber .
 
     $default  reduce using rule 22 (constant)
 
 
-state 234
+state 235
 
     5 quotedstringconstant: comilla . stringcharacter comilla
    17 quotedcharacterconstant: comilla . stringcharacter comilla
@@ -3944,45 +3949,45 @@ state 234
     anychar  shift, and go to state 182
     comilla  shift, and go to state 183
 
-    stringcharacter  go to state 317
-
-
-state 235
-
-   20 constant: '+' . constantidentifier
-
-    constantidentifier  shift, and go to state 318
+    stringcharacter  go to state 318
 
 
 state 236
 
-   21 constant: '-' . constantidentifier
+   20 constant: '+' . constantidentifier
 
     constantidentifier  shift, and go to state 319
 
 
 state 237
 
+   21 constant: '-' . constantidentifier
+
+    constantidentifier  shift, and go to state 320
+
+
+state 238
+
    23 constant: quotedstringconstant .
 
     $default  reduce using rule 23 (constant)
 
 
-state 238
+state 239
 
    24 constant: quotedcharacterconstant .
 
     $default  reduce using rule 24 (constant)
 
 
-state 239
+state 240
 
    18 constantdeclaration: identifier '=' constant . ';'
 
-    ';'  shift, and go to state 320
+    ';'  shift, and go to state 321
 
 
-state 240
+state 241
 
    13 structuredtypeidentifier: identifier .
    14 pointertypeidentifier: identifier .
@@ -4002,353 +4007,336 @@ state 240
     $default  reduce using rule 13 (structuredtypeidentifier)
 
 
-state 241
+state 242
 
    59 ordinaltype: ordinaltypeidentifier .
 
     $default  reduce using rule 59 (ordinaltype)
 
 
-state 242
+state 243
 
    56 realtypeidentifier: tk_real .
 
     $default  reduce using rule 56 (realtypeidentifier)
 
 
-state 243
+state 244
 
    60 stringtype: tk_string . '[' sizeattribute ']'
 
-    '['  shift, and go to state 321
+    '['  shift, and go to state 322
 
 
-state 244
+state 245
 
    70 structuredtype: tk_packed . arraytype
    71               | tk_packed . settype
    72               | tk_packed . filetype
    73               | tk_packed . recordtype
 
-    tk_array   shift, and go to state 245
-    tk_record  shift, and go to state 246
-    tk_set     shift, and go to state 247
-    tk_file    shift, and go to state 248
+    tk_array   shift, and go to state 246
+    tk_record  shift, and go to state 247
+    tk_set     shift, and go to state 248
+    tk_file    shift, and go to state 249
 
-    arraytype   go to state 322
-    recordtype  go to state 323
-    settype     go to state 324
-    filetype    go to state 325
-
-
-state 245
-
-   75 arraytype: tk_array . '[' indextypes ']' tk_of type
-
-    '['  shift, and go to state 326
+    arraytype   go to state 323
+    recordtype  go to state 324
+    settype     go to state 325
+    filetype    go to state 326
 
 
 state 246
+
+   75 arraytype: tk_array . '[' indextypes ']' tk_of type
+
+    '['  shift, and go to state 327
+
+
+state 247
 
    79 recordtype: tk_record . tk_end
    80           | tk_record . fieldlist tk_end
 
     identifier  shift, and go to state 20
-    tk_end      shift, and go to state 327
-    tk_case     shift, and go to state 328
+    tk_end      shift, and go to state 328
+    tk_case     shift, and go to state 329
 
-    fieldlist          go to state 329
-    fixedpart          go to state 330
-    fielddeclarations  go to state 331
-    fielddeclaration   go to state 332
-    variantpart        go to state 333
-    identifierlist     go to state 334
-
-
-state 247
-
-   99 settype: tk_set . tk_of ordinaltype
-
-    tk_of  shift, and go to state 335
+    fieldlist          go to state 330
+    fixedpart          go to state 331
+    fielddeclarations  go to state 332
+    fielddeclaration   go to state 333
+    variantpart        go to state 334
+    identifierlist     go to state 335
 
 
 state 248
 
+   99 settype: tk_set . tk_of ordinaltype
+
+    tk_of  shift, and go to state 336
+
+
+state 249
+
   100 filetype: tk_file .
   101         | tk_file . tk_of type
 
-    tk_of  shift, and go to state 336
+    tk_of  shift, and go to state 337
 
     $default  reduce using rule 100 (filetype)
 
 
-state 249
+state 250
 
    64 enumeratedtype: '(' . identifierlist ')'
 
     identifier  shift, and go to state 20
 
-    identifierlist  go to state 337
-
-
-state 250
-
-  102 pointertype: '^' . basetype
-
-    identifier  shift, and go to state 338
-
-    typeidentifier  go to state 339
-    basetype        go to state 340
+    identifierlist  go to state 338
 
 
 state 251
+
+  102 pointertype: '^' . basetype
+
+    identifier  shift, and go to state 339
+
+    typeidentifier  go to state 340
+    basetype        go to state 341
+
+
+state 252
 
    74 structuredtype: structuredtypeidentifier .
 
     $default  reduce using rule 74 (structuredtype)
 
 
-state 252
+state 253
 
   103 pointertype: pointertypeidentifier .
 
     $default  reduce using rule 103 (pointertype)
 
 
-state 253
+state 254
 
    65 subrangetype: constant . range_op constant
 
-    range_op  shift, and go to state 341
-
-
-state 254
-
-   48 typedeclaration: identifier '=' type . ';'
-
-    ';'  shift, and go to state 342
+    range_op  shift, and go to state 342
 
 
 state 255
+
+   48 typedeclaration: identifier '=' type . ';'
+
+    ';'  shift, and go to state 343
+
+
+state 256
 
    49 type: simpletype .
 
     $default  reduce using rule 49 (type)
 
 
-state 256
+state 257
 
    53 simpletype: realtype .
 
     $default  reduce using rule 53 (simpletype)
 
 
-state 257
+state 258
 
    55 realtype: realtypeidentifier .
 
     $default  reduce using rule 55 (realtype)
 
 
-state 258
+state 259
 
    52 simpletype: ordinaltype .
 
     $default  reduce using rule 52 (simpletype)
 
 
-state 259
+state 260
 
    54 simpletype: stringtype .
 
     $default  reduce using rule 54 (simpletype)
 
 
-state 260
+state 261
 
    61 stringtype: stringtypeidentifier .
 
     $default  reduce using rule 61 (stringtype)
 
 
-state 261
+state 262
 
    58 ordinaltype: enumeratedtype .
 
     $default  reduce using rule 58 (ordinaltype)
 
 
-state 262
+state 263
 
    57 ordinaltype: subrangetype .
 
     $default  reduce using rule 57 (ordinaltype)
 
 
-state 263
+state 264
 
    50 type: structuredtype .
 
     $default  reduce using rule 50 (type)
 
 
-state 264
+state 265
 
    66 structuredtype: arraytype .
 
     $default  reduce using rule 66 (structuredtype)
 
 
-state 265
+state 266
 
    69 structuredtype: recordtype .
 
     $default  reduce using rule 69 (structuredtype)
 
 
-state 266
+state 267
 
    67 structuredtype: settype .
 
     $default  reduce using rule 67 (structuredtype)
 
 
-state 267
+state 268
 
    68 structuredtype: filetype .
 
     $default  reduce using rule 68 (structuredtype)
 
 
-state 268
+state 269
 
    51 type: pointertype .
 
     $default  reduce using rule 51 (type)
 
 
-state 269
+state 270
 
   105 variabledeclaration: identifierlist ':' type . ';'
 
-    ';'  shift, and go to state 343
-
-
-state 270
-
-  236 parameterdeclaration: tk_var . identifierlist ':' typeidentifier
-
-    identifier  shift, and go to state 20
-
-    identifierlist  go to state 344
+    ';'  shift, and go to state 344
 
 
 state 271
 
-  237 parameterdeclaration: identifierlist . ':' typeidentifier
+  235 parameterdeclaration: tk_var . identifierlist ':' typeidentifier
 
-    ':'  shift, and go to state 345
+    identifier  shift, and go to state 20
+
+    identifierlist  go to state 345
 
 
 state 272
 
-  234 formalparameter: procedureheading .
+  236 parameterdeclaration: identifierlist . ':' typeidentifier
 
-    $default  reduce using rule 234 (formalparameter)
+    ':'  shift, and go to state 346
 
 
 state 273
 
-  235 formalparameter: functionheading .
-
-    $default  reduce using rule 235 (formalparameter)
-
-
-state 274
-
-  238 formalparameters: formalparameter . ';' formalparameters
-  239                 | formalparameter .
-
-    ';'  shift, and go to state 346
-
-    $default  reduce using rule 239 (formalparameters)
-
-
-state 275
-
-  233 formalparameter: parameterdeclaration .
+  233 formalparameter: procedureheading .
 
     $default  reduce using rule 233 (formalparameter)
 
 
+state 274
+
+  234 formalparameter: functionheading .
+
+    $default  reduce using rule 234 (formalparameter)
+
+
+state 275
+
+  237 formalparameters: formalparameter . ';' formalparameters
+  238                 | formalparameter .
+
+    ';'  shift, and go to state 347
+
+    $default  reduce using rule 238 (formalparameters)
+
+
 state 276
 
-  240 formalparameterlist: '(' formalparameters . ')'
+  232 formalparameter: parameterdeclaration .
 
-    ')'  shift, and go to state 347
+    $default  reduce using rule 232 (formalparameter)
 
 
 state 277
 
-  229 functionheading: tk_function identifier optionalformalparameterlist ':' . resulttype
+  239 formalparameterlist: '(' formalparameters . ')'
 
-    identifier             shift, and go to state 348
-    ordinaltypeidentifier  shift, and go to state 349
-    tk_real                shift, and go to state 242
-
-    pointertypeidentifier  go to state 350
-    realtypeidentifier     go to state 351
-    resulttype             go to state 352
+    ')'  shift, and go to state 348
 
 
 state 278
 
-  218 proceduredeclaration: procedureheading ';' procedurebody ';' .
+  228 functionheading: tk_function identifier optionalformalparameterlist ':' . resulttype
 
-    $default  reduce using rule 218 (proceduredeclaration)
+    identifier             shift, and go to state 349
+    ordinaltypeidentifier  shift, and go to state 350
+    tk_real                shift, and go to state 243
+
+    pointertypeidentifier  go to state 351
+    realtypeidentifier     go to state 352
+    resulttype             go to state 353
 
 
 state 279
 
-  225 functiondeclaration: functionheading ';' functionbody ';' .
+  217 proceduredeclaration: procedureheading ';' procedurebody ';' .
 
-    $default  reduce using rule 225 (functiondeclaration)
+    $default  reduce using rule 217 (proceduredeclaration)
 
 
 state 280
 
-  258 optionalunitvariabledeclarationpart: variabledeclarationpart .
+  224 functiondeclaration: functionheading ';' functionbody ';' .
 
-    $default  reduce using rule 258 (optionalunitvariabledeclarationpart)
+    $default  reduce using rule 224 (functiondeclaration)
 
 
 state 281
 
-  250 interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart . optionalunitprocedureandfunctiondeclarationpart
+  257 optionalunitvariabledeclarationpart: variabledeclarationpart .
 
-    tk_function   shift, and go to state 29
-    tk_procedure  shift, and go to state 30
-
-    $default  reduce using rule 261 (optionalunitprocedureandfunctiondeclarationpart)
-
-    procedureandfunctiondeclarationpart              go to state 353
-    proceduredeclaration                             go to state 39
-    procedureheading                                 go to state 40
-    functiondeclaration                              go to state 41
-    functionheading                                  go to state 42
-    optionalunitprocedureandfunctiondeclarationpart  go to state 354
+    $default  reduce using rule 257 (optionalunitvariabledeclarationpart)
 
 
 state 282
 
-  251 implementationpart: tk_implementation optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart . optionalunitprocedureandfunctiondeclarationpart
+  249 interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart . optionalunitprocedureandfunctiondeclarationpart
 
     tk_function   shift, and go to state 29
     tk_procedure  shift, and go to state 30
 
-    $default  reduce using rule 261 (optionalunitprocedureandfunctiondeclarationpart)
+    $default  reduce using rule 260 (optionalunitprocedureandfunctiondeclarationpart)
 
-    procedureandfunctiondeclarationpart              go to state 353
+    procedureandfunctiondeclarationpart              go to state 354
     proceduredeclaration                             go to state 39
     procedureheading                                 go to state 40
     functiondeclaration                              go to state 41
@@ -4358,19 +4346,36 @@ state 282
 
 state 283
 
+  250 implementationpart: tk_implementation optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart . optionalunitprocedureandfunctiondeclarationpart
+
+    tk_function   shift, and go to state 29
+    tk_procedure  shift, and go to state 30
+
+    $default  reduce using rule 260 (optionalunitprocedureandfunctiondeclarationpart)
+
+    procedureandfunctiondeclarationpart              go to state 354
+    proceduredeclaration                             go to state 39
+    procedureheading                                 go to state 40
+    functiondeclaration                              go to state 41
+    functionheading                                  go to state 42
+    optionalunitprocedureandfunctiondeclarationpart  go to state 356
+
+
+state 284
+
    16 stringcharacter: comilla comilla .
 
     $default  reduce using rule 16 (stringcharacter)
 
 
-state 284
+state 285
 
     5 quotedstringconstant: comilla stringcharacter comilla .
 
     $default  reduce using rule 5 (quotedstringconstant)
 
 
-state 285
+state 286
 
   168 membergroup: expression range_op . expression
 
@@ -4395,19 +4400,19 @@ state 285
     term                  go to state 126
     simpleexpression      go to state 127
     unsignedexpression    go to state 128
-    expression            go to state 356
+    expression            go to state 357
     functioncall          go to state 130
     setconstructor        go to state 131
 
 
-state 286
+state 287
 
   163 setconstructor: '[' membergroups ']' .
 
     $default  reduce using rule 163 (setconstructor)
 
 
-state 287
+state 288
 
   166 membergroups: membergroup ',' . membergroups
 
@@ -4435,208 +4440,204 @@ state 287
     expression            go to state 189
     functioncall          go to state 130
     setconstructor        go to state 131
-    membergroups          go to state 357
+    membergroups          go to state 358
     membergroup           go to state 191
 
 
-state 288
+state 289
 
   128 factor: '(' expression ')' .
 
     $default  reduce using rule 128 (factor)
 
 
-state 289
+state 290
 
   137 term: factor tk_div term .
 
     $default  reduce using rule 137 (term)
 
 
-state 290
+state 291
 
   138 term: factor tk_mod term .
 
     $default  reduce using rule 138 (term)
 
 
-state 291
+state 292
 
   139 term: factor tk_and term .
 
     $default  reduce using rule 139 (term)
 
 
-state 292
+state 293
 
   135 term: factor '*' term .
 
     $default  reduce using rule 135 (term)
 
 
-state 293
+state 294
 
   136 term: factor '/' term .
 
     $default  reduce using rule 136 (term)
 
 
-state 294
+state 295
 
   145 unsignedexpression: term tk_or unsignedexpression .
 
     $default  reduce using rule 145 (unsignedexpression)
 
 
-state 295
+state 296
 
   143 unsignedexpression: term '+' unsignedexpression .
 
     $default  reduce using rule 143 (unsignedexpression)
 
 
-state 296
+state 297
 
   144 unsignedexpression: term '-' unsignedexpression .
 
     $default  reduce using rule 144 (unsignedexpression)
 
 
-state 297
+state 298
 
   149 expression: simpleexpression tk_in simpleexpression .
 
     $default  reduce using rule 149 (expression)
 
 
-state 298
+state 299
 
   147 expression: simpleexpression comparison_op simpleexpression .
 
     $default  reduce using rule 147 (expression)
 
 
-state 299
+state 300
 
   148 expression: simpleexpression '=' simpleexpression .
 
     $default  reduce using rule 148 (expression)
 
 
-state 300
+state 301
 
   150 expression: simpleexpression '>' simpleexpression .
 
     $default  reduce using rule 150 (expression)
 
 
-state 301
+state 302
 
   151 expression: simpleexpression '<' simpleexpression .
 
     $default  reduce using rule 151 (expression)
 
 
-state 302
+state 303
 
    96 constants: constant .
    97          | constant . ',' constants
-  201          | constant . ',' constants
-  202          | constant .
 
-    ','  shift, and go to state 358
+    ','  shift, and go to state 359
 
-    ':'       reduce using rule 96 (constants)
-    ':'       [reduce using rule 202 (constants)]
     $default  reduce using rule 96 (constants)
-
-
-state 303
-
-  200 case: constants . ':' statement
-
-    ':'  shift, and go to state 359
 
 
 state 304
 
-  194 casestatement: tk_case expression tk_of cases . tk_end
-  195              | tk_case expression tk_of cases . otherwiseclause tk_end
-  196              | tk_case expression tk_of cases . ';' tk_end
-  197              | tk_case expression tk_of cases . otherwiseclause ';' tk_end
+  201 case: constants . ':' statement
 
-    tk_end  shift, and go to state 360
-    ';'     shift, and go to state 361
-
-    otherwiseclause  go to state 362
+    ':'  shift, and go to state 360
 
 
 state 305
 
-  198 cases: case . ',' cases
-  199      | case .
+  195 casestatement: tk_case expression tk_of cases . tk_end
+  196              | tk_case expression tk_of cases . otherwiseclause tk_end
+  197              | tk_case expression tk_of cases . ';' tk_end
+  198              | tk_case expression tk_of cases . otherwiseclause ';' tk_end
 
-    ','  shift, and go to state 363
+    tk_end  shift, and go to state 361
+    ';'     shift, and go to state 362
 
-    $default  reduce using rule 199 (cases)
+    otherwiseclause  go to state 363
 
 
 state 306
 
-  192 ifstatement: tk_if expression tk_then statement .
-  193            | tk_if expression tk_then statement . tk_else statement
+  199 cases: case . ',' cases
+  200      | case .
 
-    tk_else  shift, and go to state 364
+    ','  shift, and go to state 364
 
-    tk_else   [reduce using rule 192 (ifstatement)]
-    $default  reduce using rule 192 (ifstatement)
+    $default  reduce using rule 200 (cases)
 
 
 state 307
 
-  207 repeatstatement: tk_repeat statements tk_until expression .
+  193 ifstatement: tk_if expression tk_then statement .
+  194            | tk_if expression tk_then statement . tk_else statement
 
-    $default  reduce using rule 207 (repeatstatement)
+    tk_else  shift, and go to state 365
+
+    tk_else   [reduce using rule 193 (ifstatement)]
+    $default  reduce using rule 193 (ifstatement)
 
 
 state 308
 
-  208 whilestatement: tk_while expression tk_do statement .
+  206 repeatstatement: tk_repeat statements tk_until expression .
 
-    $default  reduce using rule 208 (whilestatement)
+    $default  reduce using rule 206 (repeatstatement)
 
 
 state 309
 
-  212 initialvalue: expression .
+  207 whilestatement: tk_while expression tk_do statement .
 
-    $default  reduce using rule 212 (initialvalue)
+    $default  reduce using rule 207 (whilestatement)
 
 
 state 310
 
-  209 forstatement: tk_for controlvariable assignment_op initialvalue . tk_to finalvalue tk_do statement
-  210             | tk_for controlvariable assignment_op initialvalue . tk_downto finalvalue tk_do statement
+  211 initialvalue: expression .
 
-    tk_to      shift, and go to state 365
-    tk_downto  shift, and go to state 366
+    $default  reduce using rule 211 (initialvalue)
 
 
 state 311
 
-  214 withstatement: tk_with recordvariablereferences tk_do statement .
+  208 forstatement: tk_for controlvariable assignment_op initialvalue . tk_to finalvalue tk_do statement
+  209             | tk_for controlvariable assignment_op initialvalue . tk_downto finalvalue tk_do statement
 
-    $default  reduce using rule 214 (withstatement)
+    tk_to      shift, and go to state 366
+    tk_downto  shift, and go to state 367
 
 
 state 312
 
-  216 recordvariablereferences: recordvariablereference ',' recordvariablereferences .
+  213 withstatement: tk_with recordvariablereferences tk_do statement .
 
-    $default  reduce using rule 216 (recordvariablereferences)
+    $default  reduce using rule 213 (withstatement)
 
 
 state 313
+
+  215 recordvariablereferences: recordvariablereference ',' recordvariablereferences .
+
+    $default  reduce using rule 215 (recordvariablereferences)
+
+
+state 314
 
   157 actualparametergroup: actualparametergroup ',' . actualparameter
 
@@ -4668,25 +4669,25 @@ state 313
     unsignedexpression    go to state 128
     expression            go to state 222
     functioncall          go to state 130
-    actualparameter       go to state 367
+    actualparameter       go to state 368
     setconstructor        go to state 131
 
 
-state 314
+state 315
 
   155 actualparameterlist: '(' actualparametergroup ')' .
 
     $default  reduce using rule 155 (actualparameterlist)
 
 
-state 315
+state 316
 
   117 index: '[' expressions ']' .
 
     $default  reduce using rule 117 (index)
 
 
-state 316
+state 317
 
   119 expressions: expression ',' . expressions
 
@@ -4706,7 +4707,7 @@ state 316
     functionidentifier    go to state 122
     variablereference     go to state 123
     variableidentifier    go to state 67
-    expressions           go to state 368
+    expressions           go to state 369
     factor                go to state 124
     unsignedconstant      go to state 125
     term                  go to state 126
@@ -4717,510 +4718,423 @@ state 316
     setconstructor        go to state 131
 
 
-state 317
+state 318
 
     5 quotedstringconstant: comilla stringcharacter . comilla
    17 quotedcharacterconstant: comilla stringcharacter . comilla
 
-    comilla  shift, and go to state 369
+    comilla  shift, and go to state 370
 
 
-state 318
+state 319
 
    20 constant: '+' constantidentifier .
 
     $default  reduce using rule 20 (constant)
 
 
-state 319
+state 320
 
    21 constant: '-' constantidentifier .
 
     $default  reduce using rule 21 (constant)
 
 
-state 320
+state 321
 
    18 constantdeclaration: identifier '=' constant ';' .
 
     $default  reduce using rule 18 (constantdeclaration)
 
 
-state 321
+state 322
 
    60 stringtype: tk_string '[' . sizeattribute ']'
 
-    unsignednumber  shift, and go to state 370
+    unsignednumber  shift, and go to state 371
 
-    sizeattribute  go to state 371
+    sizeattribute  go to state 372
 
 
-state 322
+state 323
 
    70 structuredtype: tk_packed arraytype .
 
     $default  reduce using rule 70 (structuredtype)
 
 
-state 323
+state 324
 
    73 structuredtype: tk_packed recordtype .
 
     $default  reduce using rule 73 (structuredtype)
 
 
-state 324
+state 325
 
    71 structuredtype: tk_packed settype .
 
     $default  reduce using rule 71 (structuredtype)
 
 
-state 325
+state 326
 
    72 structuredtype: tk_packed filetype .
 
     $default  reduce using rule 72 (structuredtype)
 
 
-state 326
+state 327
 
    75 arraytype: tk_array '[' . indextypes ']' tk_of type
 
-    identifier             shift, and go to state 232
-    signednumber           shift, and go to state 233
-    ordinaltypeidentifier  shift, and go to state 241
-    comilla                shift, and go to state 234
-    '+'                    shift, and go to state 235
-    '-'                    shift, and go to state 236
-    '('                    shift, and go to state 249
+    identifier             shift, and go to state 233
+    signednumber           shift, and go to state 234
+    ordinaltypeidentifier  shift, and go to state 242
+    comilla                shift, and go to state 235
+    '+'                    shift, and go to state 236
+    '-'                    shift, and go to state 237
+    '('                    shift, and go to state 250
 
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 253
-    ordinaltype              go to state 372
-    enumeratedtype           go to state 261
-    subrangetype             go to state 262
-    indextypes               go to state 373
-    indextype                go to state 374
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 254
+    ordinaltype              go to state 373
+    enumeratedtype           go to state 262
+    subrangetype             go to state 263
+    indextypes               go to state 374
+    indextype                go to state 375
 
 
-state 327
+state 328
 
    79 recordtype: tk_record tk_end .
 
     $default  reduce using rule 79 (recordtype)
 
 
-state 328
+state 329
 
    90 variantpart: tk_case . tagfieldtype tk_of variants
    91            | tk_case . identifier ':' tagfieldtype tk_of variants
 
-    identifier             shift, and go to state 375
-    ordinaltypeidentifier  shift, and go to state 376
+    identifier             shift, and go to state 376
+    ordinaltypeidentifier  shift, and go to state 377
 
-    tagfieldtype  go to state 377
-
-
-state 329
-
-   80 recordtype: tk_record fieldlist . tk_end
-
-    tk_end  shift, and go to state 378
+    tagfieldtype  go to state 378
 
 
 state 330
+
+   80 recordtype: tk_record fieldlist . tk_end
+
+    tk_end  shift, and go to state 379
+
+
+state 331
 
    81 fieldlist: fixedpart .
    82          | fixedpart . ';' variantpart
    83          | fixedpart . ';' variantpart ';'
 
-    ';'  shift, and go to state 379
+    ';'  shift, and go to state 380
 
     $default  reduce using rule 81 (fieldlist)
 
 
-state 331
+state 332
 
    86 fixedpart: fielddeclarations .
 
     $default  reduce using rule 86 (fixedpart)
 
 
-state 332
+state 333
 
    87 fielddeclarations: fielddeclaration .
    88                  | fielddeclaration . ';' fielddeclarations
 
-    ';'  shift, and go to state 380
+    ';'  shift, and go to state 381
 
     ';'       [reduce using rule 87 (fielddeclarations)]
     $default  reduce using rule 87 (fielddeclarations)
 
 
-state 333
+state 334
 
    84 fieldlist: variantpart .
    85          | variantpart . ';'
 
-    ';'  shift, and go to state 381
+    ';'  shift, and go to state 382
 
     $default  reduce using rule 84 (fieldlist)
 
 
-state 334
+state 335
 
    89 fielddeclaration: identifierlist . ':' type
 
-    ':'  shift, and go to state 382
-
-
-state 335
-
-   99 settype: tk_set tk_of . ordinaltype
-
-    identifier             shift, and go to state 232
-    signednumber           shift, and go to state 233
-    ordinaltypeidentifier  shift, and go to state 241
-    comilla                shift, and go to state 234
-    '+'                    shift, and go to state 235
-    '-'                    shift, and go to state 236
-    '('                    shift, and go to state 249
-
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 253
-    ordinaltype              go to state 383
-    enumeratedtype           go to state 261
-    subrangetype             go to state 262
+    ':'  shift, and go to state 383
 
 
 state 336
 
-  101 filetype: tk_file tk_of . type
+   99 settype: tk_set tk_of . ordinaltype
 
-    identifier             shift, and go to state 240
-    signednumber           shift, and go to state 233
-    ordinaltypeidentifier  shift, and go to state 241
-    comilla                shift, and go to state 234
-    tk_real                shift, and go to state 242
-    tk_string              shift, and go to state 243
-    tk_packed              shift, and go to state 244
-    tk_array               shift, and go to state 245
-    tk_record              shift, and go to state 246
-    tk_set                 shift, and go to state 247
-    tk_file                shift, and go to state 248
-    '+'                    shift, and go to state 235
-    '-'                    shift, and go to state 236
-    '('                    shift, and go to state 249
-    '^'                    shift, and go to state 250
+    identifier             shift, and go to state 233
+    signednumber           shift, and go to state 234
+    ordinaltypeidentifier  shift, and go to state 242
+    comilla                shift, and go to state 235
+    '+'                    shift, and go to state 236
+    '-'                    shift, and go to state 237
+    '('                    shift, and go to state 250
 
-    quotedstringconstant      go to state 237
-    structuredtypeidentifier  go to state 251
-    pointertypeidentifier     go to state 252
-    quotedcharacterconstant   go to state 238
-    constant                  go to state 253
-    type                      go to state 384
-    simpletype                go to state 255
-    realtype                  go to state 256
-    realtypeidentifier        go to state 257
-    ordinaltype               go to state 258
-    stringtype                go to state 259
-    stringtypeidentifier      go to state 260
-    enumeratedtype            go to state 261
-    subrangetype              go to state 262
-    structuredtype            go to state 263
-    arraytype                 go to state 264
-    recordtype                go to state 265
-    settype                   go to state 266
-    filetype                  go to state 267
-    pointertype               go to state 268
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 254
+    ordinaltype              go to state 384
+    enumeratedtype           go to state 262
+    subrangetype             go to state 263
 
 
 state 337
 
-   64 enumeratedtype: '(' identifierlist . ')'
+  101 filetype: tk_file tk_of . type
 
-    ')'  shift, and go to state 385
+    identifier             shift, and go to state 241
+    signednumber           shift, and go to state 234
+    ordinaltypeidentifier  shift, and go to state 242
+    comilla                shift, and go to state 235
+    tk_real                shift, and go to state 243
+    tk_string              shift, and go to state 244
+    tk_packed              shift, and go to state 245
+    tk_array               shift, and go to state 246
+    tk_record              shift, and go to state 247
+    tk_set                 shift, and go to state 248
+    tk_file                shift, and go to state 249
+    '+'                    shift, and go to state 236
+    '-'                    shift, and go to state 237
+    '('                    shift, and go to state 250
+    '^'                    shift, and go to state 251
+
+    quotedstringconstant      go to state 238
+    structuredtypeidentifier  go to state 252
+    pointertypeidentifier     go to state 253
+    quotedcharacterconstant   go to state 239
+    constant                  go to state 254
+    type                      go to state 385
+    simpletype                go to state 256
+    realtype                  go to state 257
+    realtypeidentifier        go to state 258
+    ordinaltype               go to state 259
+    stringtype                go to state 260
+    stringtypeidentifier      go to state 261
+    enumeratedtype            go to state 262
+    subrangetype              go to state 263
+    structuredtype            go to state 264
+    arraytype                 go to state 265
+    recordtype                go to state 266
+    settype                   go to state 267
+    filetype                  go to state 268
+    pointertype               go to state 269
 
 
 state 338
+
+   64 enumeratedtype: '(' identifierlist . ')'
+
+    ')'  shift, and go to state 386
+
+
+state 339
 
    12 typeidentifier: identifier .
 
     $default  reduce using rule 12 (typeidentifier)
 
 
-state 339
+state 340
 
   104 basetype: typeidentifier .
 
     $default  reduce using rule 104 (basetype)
 
 
-state 340
+state 341
 
   102 pointertype: '^' basetype .
 
     $default  reduce using rule 102 (pointertype)
 
 
-state 341
+state 342
 
    65 subrangetype: constant range_op . constant
 
-    identifier    shift, and go to state 232
-    signednumber  shift, and go to state 233
-    comilla       shift, and go to state 234
-    '+'           shift, and go to state 235
-    '-'           shift, and go to state 236
+    identifier    shift, and go to state 233
+    signednumber  shift, and go to state 234
+    comilla       shift, and go to state 235
+    '+'           shift, and go to state 236
+    '-'           shift, and go to state 237
 
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 386
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 387
 
 
-state 342
+state 343
 
    48 typedeclaration: identifier '=' type ';' .
 
     $default  reduce using rule 48 (typedeclaration)
 
 
-state 343
+state 344
 
   105 variabledeclaration: identifierlist ':' type ';' .
 
     $default  reduce using rule 105 (variabledeclaration)
 
 
-state 344
-
-  236 parameterdeclaration: tk_var identifierlist . ':' typeidentifier
-
-    ':'  shift, and go to state 387
-
-
 state 345
 
-  237 parameterdeclaration: identifierlist ':' . typeidentifier
+  235 parameterdeclaration: tk_var identifierlist . ':' typeidentifier
 
-    identifier  shift, and go to state 338
-
-    typeidentifier  go to state 388
+    ':'  shift, and go to state 388
 
 
 state 346
 
-  238 formalparameters: formalparameter ';' . formalparameters
+  236 parameterdeclaration: identifierlist ':' . typeidentifier
 
-    identifier    shift, and go to state 20
-    tk_var        shift, and go to state 270
-    tk_function   shift, and go to state 29
-    tk_procedure  shift, and go to state 30
+    identifier  shift, and go to state 339
 
-    identifierlist        go to state 271
-    procedureheading      go to state 272
-    functionheading       go to state 273
-    formalparameter       go to state 274
-    parameterdeclaration  go to state 275
-    formalparameters      go to state 389
+    typeidentifier  go to state 389
 
 
 state 347
 
-  240 formalparameterlist: '(' formalparameters ')' .
+  237 formalparameters: formalparameter ';' . formalparameters
 
-    $default  reduce using rule 240 (formalparameterlist)
+    identifier    shift, and go to state 20
+    tk_var        shift, and go to state 271
+    tk_function   shift, and go to state 29
+    tk_procedure  shift, and go to state 30
+
+    identifierlist        go to state 272
+    procedureheading      go to state 273
+    functionheading       go to state 274
+    formalparameter       go to state 275
+    parameterdeclaration  go to state 276
+    formalparameters      go to state 390
 
 
 state 348
+
+  239 formalparameterlist: '(' formalparameters ')' .
+
+    $default  reduce using rule 239 (formalparameterlist)
+
+
+state 349
 
    14 pointertypeidentifier: identifier .
 
     $default  reduce using rule 14 (pointertypeidentifier)
 
 
-state 349
-
-  230 resulttype: ordinaltypeidentifier .
-
-    $default  reduce using rule 230 (resulttype)
-
-
 state 350
 
-  232 resulttype: pointertypeidentifier .
+  229 resulttype: ordinaltypeidentifier .
 
-    $default  reduce using rule 232 (resulttype)
+    $default  reduce using rule 229 (resulttype)
 
 
 state 351
 
-  231 resulttype: realtypeidentifier .
+  231 resulttype: pointertypeidentifier .
 
     $default  reduce using rule 231 (resulttype)
 
 
 state 352
 
-  229 functionheading: tk_function identifier optionalformalparameterlist ':' resulttype .
+  230 resulttype: realtypeidentifier .
 
-    $default  reduce using rule 229 (functionheading)
+    $default  reduce using rule 230 (resulttype)
 
 
 state 353
 
-   45 procedureandfunctiondeclarationpart: procedureandfunctiondeclarationpart . functiondeclaration
-   46                                    | procedureandfunctiondeclarationpart . proceduredeclaration
-  260 optionalunitprocedureandfunctiondeclarationpart: procedureandfunctiondeclarationpart .
+  228 functionheading: tk_function identifier optionalformalparameterlist ':' resulttype .
 
-    tk_function   shift, and go to state 29
-    tk_procedure  shift, and go to state 30
-
-    $default  reduce using rule 260 (optionalunitprocedureandfunctiondeclarationpart)
-
-    proceduredeclaration  go to state 390
-    procedureheading      go to state 40
-    functiondeclaration   go to state 391
-    functionheading       go to state 42
+    $default  reduce using rule 228 (functionheading)
 
 
 state 354
 
-  250 interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart .
+   45 procedureandfunctiondeclarationpart: procedureandfunctiondeclarationpart . functiondeclaration
+   46                                    | procedureandfunctiondeclarationpart . proceduredeclaration
+  259 optionalunitprocedureandfunctiondeclarationpart: procedureandfunctiondeclarationpart .
 
-    $default  reduce using rule 250 (interfacepart)
+    tk_function   shift, and go to state 29
+    tk_procedure  shift, and go to state 30
+
+    $default  reduce using rule 259 (optionalunitprocedureandfunctiondeclarationpart)
+
+    proceduredeclaration  go to state 391
+    procedureheading      go to state 40
+    functiondeclaration   go to state 392
+    functionheading       go to state 42
 
 
 state 355
 
-  251 implementationpart: tk_implementation optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart .
+  249 interfacepart: tk_interface optionalunituseclause optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart .
 
-    $default  reduce using rule 251 (implementationpart)
+    $default  reduce using rule 249 (interfacepart)
 
 
 state 356
+
+  250 implementationpart: tk_implementation optionalunitconstantdeclarationpart optionalunittypedeclarationpart optionalunitvariabledeclarationpart optionalunitprocedureandfunctiondeclarationpart .
+
+    $default  reduce using rule 250 (implementationpart)
+
+
+state 357
 
   168 membergroup: expression range_op expression .
 
     $default  reduce using rule 168 (membergroup)
 
 
-state 357
+state 358
 
   166 membergroups: membergroup ',' membergroups .
 
     $default  reduce using rule 166 (membergroups)
 
 
-state 358
-
-   97 constants: constant ',' . constants
-  201          | constant ',' . constants
-
-    identifier    shift, and go to state 232
-    signednumber  shift, and go to state 233
-    comilla       shift, and go to state 234
-    '+'           shift, and go to state 235
-    '-'           shift, and go to state 236
-
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 302
-    constants                go to state 392
-
-
 state 359
 
-  200 case: constants ':' . statement
+   97 constants: constant ',' . constants
 
-    identifier     shift, and go to state 50
-    digitsequence  shift, and go to state 51
-    tk_begin       shift, and go to state 24
-    tk_case        shift, and go to state 52
-    tk_goto        shift, and go to state 53
-    tk_if          shift, and go to state 54
-    tk_repeat      shift, and go to state 55
-    tk_while       shift, and go to state 56
-    tk_for         shift, and go to state 57
-    tk_with        shift, and go to state 58
-    tk_read        shift, and go to state 59
-    tk_readln      shift, and go to state 60
-    tk_write       shift, and go to state 61
-    tk_writeln     shift, and go to state 62
+    identifier    shift, and go to state 233
+    signednumber  shift, and go to state 234
+    comilla       shift, and go to state 235
+    '+'           shift, and go to state 236
+    '-'           shift, and go to state 237
 
-    $default  reduce using rule 174 (statement)
-
-    label                 go to state 63
-    functionidentifier    go to state 64
-    procedureidentifier   go to state 65
-    variablereference     go to state 66
-    variableidentifier    go to state 67
-    statement             go to state 393
-    simplestatement       go to state 69
-    assignmentstatement   go to state 70
-    procedurestatement    go to state 71
-    gotostatement         go to state 72
-    structuredstatement   go to state 73
-    compoundstatement     go to state 74
-    conditionalstatement  go to state 76
-    ifstatement           go to state 77
-    casestatement         go to state 78
-    repetitivestatement   go to state 79
-    repeatstatement       go to state 80
-    whilestatement        go to state 81
-    forstatement          go to state 82
-    withstatement         go to state 83
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 303
+    constants                go to state 393
 
 
 state 360
 
-  194 casestatement: tk_case expression tk_of cases tk_end .
-
-    $default  reduce using rule 194 (casestatement)
-
-
-state 361
-
-  196 casestatement: tk_case expression tk_of cases ';' . tk_end
-  203 otherwiseclause: ';' . tk_otherwise statement
-
-    tk_end        shift, and go to state 394
-    tk_otherwise  shift, and go to state 395
-
-
-state 362
-
-  195 casestatement: tk_case expression tk_of cases otherwiseclause . tk_end
-  197              | tk_case expression tk_of cases otherwiseclause . ';' tk_end
-
-    tk_end  shift, and go to state 396
-    ';'     shift, and go to state 397
-
-
-state 363
-
-  198 cases: case ',' . cases
-
-    identifier    shift, and go to state 232
-    signednumber  shift, and go to state 233
-    comilla       shift, and go to state 234
-    '+'           shift, and go to state 235
-    '-'           shift, and go to state 236
-
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 302
-    constants                go to state 303
-    cases                    go to state 398
-    case                     go to state 305
-
-
-state 364
-
-  193 ifstatement: tk_if expression tk_then statement tk_else . statement
+  201 case: constants ':' . statement
 
     identifier     shift, and go to state 50
     digitsequence  shift, and go to state 51
@@ -5244,7 +5158,7 @@ state 364
     procedureidentifier   go to state 65
     variablereference     go to state 66
     variableidentifier    go to state 67
-    statement             go to state 399
+    statement             go to state 394
     simplestatement       go to state 69
     assignmentstatement   go to state 70
     procedurestatement    go to state 71
@@ -5261,40 +5175,95 @@ state 364
     withstatement         go to state 83
 
 
+state 361
+
+  195 casestatement: tk_case expression tk_of cases tk_end .
+
+    $default  reduce using rule 195 (casestatement)
+
+
+state 362
+
+  197 casestatement: tk_case expression tk_of cases ';' . tk_end
+  202 otherwiseclause: ';' . tk_otherwise statement
+
+    tk_end        shift, and go to state 395
+    tk_otherwise  shift, and go to state 396
+
+
+state 363
+
+  196 casestatement: tk_case expression tk_of cases otherwiseclause . tk_end
+  198              | tk_case expression tk_of cases otherwiseclause . ';' tk_end
+
+    tk_end  shift, and go to state 397
+    ';'     shift, and go to state 398
+
+
+state 364
+
+  199 cases: case ',' . cases
+
+    identifier    shift, and go to state 233
+    signednumber  shift, and go to state 234
+    comilla       shift, and go to state 235
+    '+'           shift, and go to state 236
+    '-'           shift, and go to state 237
+
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 303
+    constants                go to state 304
+    cases                    go to state 399
+    case                     go to state 306
+
+
 state 365
 
-  209 forstatement: tk_for controlvariable assignment_op initialvalue tk_to . finalvalue tk_do statement
+  194 ifstatement: tk_if expression tk_then statement tk_else . statement
 
-    identifier          shift, and go to state 110
-    constantidentifier  shift, and go to state 111
-    unsignednumber      shift, and go to state 112
-    comilla             shift, and go to state 113
-    tk_nil              shift, and go to state 114
-    tk_not              shift, and go to state 115
-    '+'                 shift, and go to state 116
-    '-'                 shift, and go to state 117
-    '['                 shift, and go to state 118
-    '('                 shift, and go to state 119
-    '@'                 shift, and go to state 120
+    identifier     shift, and go to state 50
+    digitsequence  shift, and go to state 51
+    tk_begin       shift, and go to state 24
+    tk_case        shift, and go to state 52
+    tk_goto        shift, and go to state 53
+    tk_if          shift, and go to state 54
+    tk_repeat      shift, and go to state 55
+    tk_while       shift, and go to state 56
+    tk_for         shift, and go to state 57
+    tk_with        shift, and go to state 58
+    tk_read        shift, and go to state 59
+    tk_readln      shift, and go to state 60
+    tk_write       shift, and go to state 61
+    tk_writeln     shift, and go to state 62
 
-    quotedstringconstant  go to state 121
-    functionidentifier    go to state 122
-    variablereference     go to state 123
+    $default  reduce using rule 174 (statement)
+
+    label                 go to state 63
+    functionidentifier    go to state 64
+    procedureidentifier   go to state 65
+    variablereference     go to state 66
     variableidentifier    go to state 67
-    factor                go to state 124
-    unsignedconstant      go to state 125
-    term                  go to state 126
-    simpleexpression      go to state 127
-    unsignedexpression    go to state 128
-    expression            go to state 400
-    functioncall          go to state 130
-    setconstructor        go to state 131
-    finalvalue            go to state 401
+    statement             go to state 400
+    simplestatement       go to state 69
+    assignmentstatement   go to state 70
+    procedurestatement    go to state 71
+    gotostatement         go to state 72
+    structuredstatement   go to state 73
+    compoundstatement     go to state 74
+    conditionalstatement  go to state 76
+    ifstatement           go to state 77
+    casestatement         go to state 78
+    repetitivestatement   go to state 79
+    repeatstatement       go to state 80
+    whilestatement        go to state 81
+    forstatement          go to state 82
+    withstatement         go to state 83
 
 
 state 366
 
-  210 forstatement: tk_for controlvariable assignment_op initialvalue tk_downto . finalvalue tk_do statement
+  208 forstatement: tk_for controlvariable assignment_op initialvalue tk_to . finalvalue tk_do statement
 
     identifier          shift, and go to state 110
     constantidentifier  shift, and go to state 111
@@ -5317,7 +5286,7 @@ state 366
     term                  go to state 126
     simpleexpression      go to state 127
     unsignedexpression    go to state 128
-    expression            go to state 400
+    expression            go to state 401
     functioncall          go to state 130
     setconstructor        go to state 131
     finalvalue            go to state 402
@@ -5325,19 +5294,50 @@ state 366
 
 state 367
 
+  209 forstatement: tk_for controlvariable assignment_op initialvalue tk_downto . finalvalue tk_do statement
+
+    identifier          shift, and go to state 110
+    constantidentifier  shift, and go to state 111
+    unsignednumber      shift, and go to state 112
+    comilla             shift, and go to state 113
+    tk_nil              shift, and go to state 114
+    tk_not              shift, and go to state 115
+    '+'                 shift, and go to state 116
+    '-'                 shift, and go to state 117
+    '['                 shift, and go to state 118
+    '('                 shift, and go to state 119
+    '@'                 shift, and go to state 120
+
+    quotedstringconstant  go to state 121
+    functionidentifier    go to state 122
+    variablereference     go to state 123
+    variableidentifier    go to state 67
+    factor                go to state 124
+    unsignedconstant      go to state 125
+    term                  go to state 126
+    simpleexpression      go to state 127
+    unsignedexpression    go to state 128
+    expression            go to state 401
+    functioncall          go to state 130
+    setconstructor        go to state 131
+    finalvalue            go to state 403
+
+
+state 368
+
   157 actualparametergroup: actualparametergroup ',' actualparameter .
 
     $default  reduce using rule 157 (actualparametergroup)
 
 
-state 368
+state 369
 
   119 expressions: expression ',' expressions .
 
     $default  reduce using rule 119 (expressions)
 
 
-state 369
+state 370
 
     5 quotedstringconstant: comilla stringcharacter comilla .
    17 quotedcharacterconstant: comilla stringcharacter comilla .
@@ -5373,249 +5373,246 @@ state 369
     $default               reduce using rule 5 (quotedstringconstant)
 
 
-state 370
+state 371
 
    63 sizeattribute: unsignednumber .
 
     $default  reduce using rule 63 (sizeattribute)
 
 
-state 371
+state 372
 
    60 stringtype: tk_string '[' sizeattribute . ']'
 
-    ']'  shift, and go to state 403
+    ']'  shift, and go to state 404
 
 
-state 372
+state 373
 
    78 indextype: ordinaltype .
 
     $default  reduce using rule 78 (indextype)
 
 
-state 373
+state 374
 
    75 arraytype: tk_array '[' indextypes . ']' tk_of type
 
-    ']'  shift, and go to state 404
-
-
-state 374
-
-   76 indextypes: indextype .
-   77           | indextype . indextypes
-
-    identifier             shift, and go to state 232
-    signednumber           shift, and go to state 233
-    ordinaltypeidentifier  shift, and go to state 241
-    comilla                shift, and go to state 234
-    '+'                    shift, and go to state 235
-    '-'                    shift, and go to state 236
-    '('                    shift, and go to state 249
-
-    $default  reduce using rule 76 (indextypes)
-
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 253
-    ordinaltype              go to state 372
-    enumeratedtype           go to state 261
-    subrangetype             go to state 262
-    indextypes               go to state 405
-    indextype                go to state 374
+    ']'  shift, and go to state 405
 
 
 state 375
 
-   91 variantpart: tk_case identifier . ':' tagfieldtype tk_of variants
+   76 indextypes: indextype .
+   77           | indextype . indextypes
 
-    ':'  shift, and go to state 406
+    identifier             shift, and go to state 233
+    signednumber           shift, and go to state 234
+    ordinaltypeidentifier  shift, and go to state 242
+    comilla                shift, and go to state 235
+    '+'                    shift, and go to state 236
+    '-'                    shift, and go to state 237
+    '('                    shift, and go to state 250
+
+    $default  reduce using rule 76 (indextypes)
+
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 254
+    ordinaltype              go to state 373
+    enumeratedtype           go to state 262
+    subrangetype             go to state 263
+    indextypes               go to state 406
+    indextype                go to state 375
 
 
 state 376
+
+   91 variantpart: tk_case identifier . ':' tagfieldtype tk_of variants
+
+    ':'  shift, and go to state 407
+
+
+state 377
 
    98 tagfieldtype: ordinaltypeidentifier .
 
     $default  reduce using rule 98 (tagfieldtype)
 
 
-state 377
+state 378
 
    90 variantpart: tk_case tagfieldtype . tk_of variants
 
-    tk_of  shift, and go to state 407
+    tk_of  shift, and go to state 408
 
 
-state 378
+state 379
 
    80 recordtype: tk_record fieldlist tk_end .
 
     $default  reduce using rule 80 (recordtype)
 
 
-state 379
+state 380
 
    82 fieldlist: fixedpart ';' . variantpart
    83          | fixedpart ';' . variantpart ';'
 
-    tk_case  shift, and go to state 328
+    tk_case  shift, and go to state 329
 
-    variantpart  go to state 408
+    variantpart  go to state 409
 
 
-state 380
+state 381
 
    88 fielddeclarations: fielddeclaration ';' . fielddeclarations
 
     identifier  shift, and go to state 20
 
-    fielddeclarations  go to state 409
-    fielddeclaration   go to state 332
-    identifierlist     go to state 334
+    fielddeclarations  go to state 410
+    fielddeclaration   go to state 333
+    identifierlist     go to state 335
 
 
-state 381
+state 382
 
    85 fieldlist: variantpart ';' .
 
     $default  reduce using rule 85 (fieldlist)
 
 
-state 382
+state 383
 
    89 fielddeclaration: identifierlist ':' . type
 
-    identifier             shift, and go to state 240
-    signednumber           shift, and go to state 233
-    ordinaltypeidentifier  shift, and go to state 241
-    comilla                shift, and go to state 234
-    tk_real                shift, and go to state 242
-    tk_string              shift, and go to state 243
-    tk_packed              shift, and go to state 244
-    tk_array               shift, and go to state 245
-    tk_record              shift, and go to state 246
-    tk_set                 shift, and go to state 247
-    tk_file                shift, and go to state 248
-    '+'                    shift, and go to state 235
-    '-'                    shift, and go to state 236
-    '('                    shift, and go to state 249
-    '^'                    shift, and go to state 250
+    identifier             shift, and go to state 241
+    signednumber           shift, and go to state 234
+    ordinaltypeidentifier  shift, and go to state 242
+    comilla                shift, and go to state 235
+    tk_real                shift, and go to state 243
+    tk_string              shift, and go to state 244
+    tk_packed              shift, and go to state 245
+    tk_array               shift, and go to state 246
+    tk_record              shift, and go to state 247
+    tk_set                 shift, and go to state 248
+    tk_file                shift, and go to state 249
+    '+'                    shift, and go to state 236
+    '-'                    shift, and go to state 237
+    '('                    shift, and go to state 250
+    '^'                    shift, and go to state 251
 
-    quotedstringconstant      go to state 237
-    structuredtypeidentifier  go to state 251
-    pointertypeidentifier     go to state 252
-    quotedcharacterconstant   go to state 238
-    constant                  go to state 253
-    type                      go to state 410
-    simpletype                go to state 255
-    realtype                  go to state 256
-    realtypeidentifier        go to state 257
-    ordinaltype               go to state 258
-    stringtype                go to state 259
-    stringtypeidentifier      go to state 260
-    enumeratedtype            go to state 261
-    subrangetype              go to state 262
-    structuredtype            go to state 263
-    arraytype                 go to state 264
-    recordtype                go to state 265
-    settype                   go to state 266
-    filetype                  go to state 267
-    pointertype               go to state 268
+    quotedstringconstant      go to state 238
+    structuredtypeidentifier  go to state 252
+    pointertypeidentifier     go to state 253
+    quotedcharacterconstant   go to state 239
+    constant                  go to state 254
+    type                      go to state 411
+    simpletype                go to state 256
+    realtype                  go to state 257
+    realtypeidentifier        go to state 258
+    ordinaltype               go to state 259
+    stringtype                go to state 260
+    stringtypeidentifier      go to state 261
+    enumeratedtype            go to state 262
+    subrangetype              go to state 263
+    structuredtype            go to state 264
+    arraytype                 go to state 265
+    recordtype                go to state 266
+    settype                   go to state 267
+    filetype                  go to state 268
+    pointertype               go to state 269
 
 
-state 383
+state 384
 
    99 settype: tk_set tk_of ordinaltype .
 
     $default  reduce using rule 99 (settype)
 
 
-state 384
+state 385
 
   101 filetype: tk_file tk_of type .
 
     $default  reduce using rule 101 (filetype)
 
 
-state 385
+state 386
 
    64 enumeratedtype: '(' identifierlist ')' .
 
     $default  reduce using rule 64 (enumeratedtype)
 
 
-state 386
+state 387
 
    65 subrangetype: constant range_op constant .
 
     $default  reduce using rule 65 (subrangetype)
 
 
-state 387
-
-  236 parameterdeclaration: tk_var identifierlist ':' . typeidentifier
-
-    identifier  shift, and go to state 338
-
-    typeidentifier  go to state 411
-
-
 state 388
 
-  237 parameterdeclaration: identifierlist ':' typeidentifier .
+  235 parameterdeclaration: tk_var identifierlist ':' . typeidentifier
 
-    $default  reduce using rule 237 (parameterdeclaration)
+    identifier  shift, and go to state 339
+
+    typeidentifier  go to state 412
 
 
 state 389
 
-  238 formalparameters: formalparameter ';' formalparameters .
+  236 parameterdeclaration: identifierlist ':' typeidentifier .
 
-    $default  reduce using rule 238 (formalparameters)
+    $default  reduce using rule 236 (parameterdeclaration)
 
 
 state 390
+
+  237 formalparameters: formalparameter ';' formalparameters .
+
+    $default  reduce using rule 237 (formalparameters)
+
+
+state 391
 
    46 procedureandfunctiondeclarationpart: procedureandfunctiondeclarationpart proceduredeclaration .
 
     $default  reduce using rule 46 (procedureandfunctiondeclarationpart)
 
 
-state 391
+state 392
 
    45 procedureandfunctiondeclarationpart: procedureandfunctiondeclarationpart functiondeclaration .
 
     $default  reduce using rule 45 (procedureandfunctiondeclarationpart)
 
 
-state 392
-
-   97 constants: constant ',' constants .
-  201          | constant ',' constants .
-
-    ':'       reduce using rule 97 (constants)
-    ':'       [reduce using rule 201 (constants)]
-    $default  reduce using rule 97 (constants)
-
-
 state 393
 
-  200 case: constants ':' statement .
+   97 constants: constant ',' constants .
 
-    $default  reduce using rule 200 (case)
+    $default  reduce using rule 97 (constants)
 
 
 state 394
 
-  196 casestatement: tk_case expression tk_of cases ';' tk_end .
+  201 case: constants ':' statement .
 
-    $default  reduce using rule 196 (casestatement)
+    $default  reduce using rule 201 (case)
 
 
 state 395
 
-  203 otherwiseclause: ';' tk_otherwise . statement
+  197 casestatement: tk_case expression tk_of cases ';' tk_end .
+
+    $default  reduce using rule 197 (casestatement)
+
+
+state 396
+
+  202 otherwiseclause: ';' tk_otherwise . statement
 
     identifier     shift, and go to state 50
     digitsequence  shift, and go to state 51
@@ -5639,7 +5636,7 @@ state 395
     procedureidentifier   go to state 65
     variablereference     go to state 66
     variableidentifier    go to state 67
-    statement             go to state 412
+    statement             go to state 413
     simplestatement       go to state 69
     assignmentstatement   go to state 70
     procedurestatement    go to state 71
@@ -5656,194 +5653,151 @@ state 395
     withstatement         go to state 83
 
 
-state 396
-
-  195 casestatement: tk_case expression tk_of cases otherwiseclause tk_end .
-
-    $default  reduce using rule 195 (casestatement)
-
-
 state 397
 
-  197 casestatement: tk_case expression tk_of cases otherwiseclause ';' . tk_end
+  196 casestatement: tk_case expression tk_of cases otherwiseclause tk_end .
 
-    tk_end  shift, and go to state 413
+    $default  reduce using rule 196 (casestatement)
 
 
 state 398
 
-  198 cases: case ',' cases .
+  198 casestatement: tk_case expression tk_of cases otherwiseclause ';' . tk_end
 
-    $default  reduce using rule 198 (cases)
+    tk_end  shift, and go to state 414
 
 
 state 399
 
-  193 ifstatement: tk_if expression tk_then statement tk_else statement .
+  199 cases: case ',' cases .
 
-    $default  reduce using rule 193 (ifstatement)
+    $default  reduce using rule 199 (cases)
 
 
 state 400
 
-  213 finalvalue: expression .
+  194 ifstatement: tk_if expression tk_then statement tk_else statement .
 
-    $default  reduce using rule 213 (finalvalue)
+    $default  reduce using rule 194 (ifstatement)
 
 
 state 401
 
-  209 forstatement: tk_for controlvariable assignment_op initialvalue tk_to finalvalue . tk_do statement
+  212 finalvalue: expression .
 
-    tk_do  shift, and go to state 414
+    $default  reduce using rule 212 (finalvalue)
 
 
 state 402
 
-  210 forstatement: tk_for controlvariable assignment_op initialvalue tk_downto finalvalue . tk_do statement
+  208 forstatement: tk_for controlvariable assignment_op initialvalue tk_to finalvalue . tk_do statement
 
     tk_do  shift, and go to state 415
 
 
 state 403
 
+  209 forstatement: tk_for controlvariable assignment_op initialvalue tk_downto finalvalue . tk_do statement
+
+    tk_do  shift, and go to state 416
+
+
+state 404
+
    60 stringtype: tk_string '[' sizeattribute ']' .
 
     $default  reduce using rule 60 (stringtype)
 
 
-state 404
+state 405
 
    75 arraytype: tk_array '[' indextypes ']' . tk_of type
 
-    tk_of  shift, and go to state 416
+    tk_of  shift, and go to state 417
 
 
-state 405
+state 406
 
    77 indextypes: indextype indextypes .
 
     $default  reduce using rule 77 (indextypes)
 
 
-state 406
+state 407
 
    91 variantpart: tk_case identifier ':' . tagfieldtype tk_of variants
 
-    ordinaltypeidentifier  shift, and go to state 376
+    ordinaltypeidentifier  shift, and go to state 377
 
-    tagfieldtype  go to state 417
-
-
-state 407
-
-   90 variantpart: tk_case tagfieldtype tk_of . variants
-
-    identifier    shift, and go to state 232
-    signednumber  shift, and go to state 233
-    comilla       shift, and go to state 234
-    '+'           shift, and go to state 235
-    '-'           shift, and go to state 236
-
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 302
-    variants                 go to state 418
-    variant                  go to state 419
-    constants                go to state 420
+    tagfieldtype  go to state 418
 
 
 state 408
 
+   90 variantpart: tk_case tagfieldtype tk_of . variants
+
+    identifier    shift, and go to state 233
+    signednumber  shift, and go to state 234
+    comilla       shift, and go to state 235
+    '+'           shift, and go to state 236
+    '-'           shift, and go to state 237
+
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 303
+    variants                 go to state 419
+    variant                  go to state 420
+    constants                go to state 421
+
+
+state 409
+
    82 fieldlist: fixedpart ';' variantpart .
    83          | fixedpart ';' variantpart . ';'
 
-    ';'  shift, and go to state 421
+    ';'  shift, and go to state 422
 
     $default  reduce using rule 82 (fieldlist)
 
 
-state 409
+state 410
 
    88 fielddeclarations: fielddeclaration ';' fielddeclarations .
 
     $default  reduce using rule 88 (fielddeclarations)
 
 
-state 410
+state 411
 
    89 fielddeclaration: identifierlist ':' type .
 
     $default  reduce using rule 89 (fielddeclaration)
 
 
-state 411
-
-  236 parameterdeclaration: tk_var identifierlist ':' typeidentifier .
-
-    $default  reduce using rule 236 (parameterdeclaration)
-
-
 state 412
 
-  203 otherwiseclause: ';' tk_otherwise statement .
+  235 parameterdeclaration: tk_var identifierlist ':' typeidentifier .
 
-    $default  reduce using rule 203 (otherwiseclause)
+    $default  reduce using rule 235 (parameterdeclaration)
 
 
 state 413
 
-  197 casestatement: tk_case expression tk_of cases otherwiseclause ';' tk_end .
+  202 otherwiseclause: ';' tk_otherwise statement .
 
-    $default  reduce using rule 197 (casestatement)
+    $default  reduce using rule 202 (otherwiseclause)
 
 
 state 414
 
-  209 forstatement: tk_for controlvariable assignment_op initialvalue tk_to finalvalue tk_do . statement
+  198 casestatement: tk_case expression tk_of cases otherwiseclause ';' tk_end .
 
-    identifier     shift, and go to state 50
-    digitsequence  shift, and go to state 51
-    tk_begin       shift, and go to state 24
-    tk_case        shift, and go to state 52
-    tk_goto        shift, and go to state 53
-    tk_if          shift, and go to state 54
-    tk_repeat      shift, and go to state 55
-    tk_while       shift, and go to state 56
-    tk_for         shift, and go to state 57
-    tk_with        shift, and go to state 58
-    tk_read        shift, and go to state 59
-    tk_readln      shift, and go to state 60
-    tk_write       shift, and go to state 61
-    tk_writeln     shift, and go to state 62
-
-    $default  reduce using rule 174 (statement)
-
-    label                 go to state 63
-    functionidentifier    go to state 64
-    procedureidentifier   go to state 65
-    variablereference     go to state 66
-    variableidentifier    go to state 67
-    statement             go to state 422
-    simplestatement       go to state 69
-    assignmentstatement   go to state 70
-    procedurestatement    go to state 71
-    gotostatement         go to state 72
-    structuredstatement   go to state 73
-    compoundstatement     go to state 74
-    conditionalstatement  go to state 76
-    ifstatement           go to state 77
-    casestatement         go to state 78
-    repetitivestatement   go to state 79
-    repeatstatement       go to state 80
-    whilestatement        go to state 81
-    forstatement          go to state 82
-    withstatement         go to state 83
+    $default  reduce using rule 198 (casestatement)
 
 
 state 415
 
-  210 forstatement: tk_for controlvariable assignment_op initialvalue tk_downto finalvalue tk_do . statement
+  208 forstatement: tk_for controlvariable assignment_op initialvalue tk_to finalvalue tk_do . statement
 
     identifier     shift, and go to state 50
     digitsequence  shift, and go to state 51
@@ -5886,197 +5840,240 @@ state 415
 
 state 416
 
-   75 arraytype: tk_array '[' indextypes ']' tk_of . type
+  209 forstatement: tk_for controlvariable assignment_op initialvalue tk_downto finalvalue tk_do . statement
 
-    identifier             shift, and go to state 240
-    signednumber           shift, and go to state 233
-    ordinaltypeidentifier  shift, and go to state 241
-    comilla                shift, and go to state 234
-    tk_real                shift, and go to state 242
-    tk_string              shift, and go to state 243
-    tk_packed              shift, and go to state 244
-    tk_array               shift, and go to state 245
-    tk_record              shift, and go to state 246
-    tk_set                 shift, and go to state 247
-    tk_file                shift, and go to state 248
-    '+'                    shift, and go to state 235
-    '-'                    shift, and go to state 236
-    '('                    shift, and go to state 249
-    '^'                    shift, and go to state 250
+    identifier     shift, and go to state 50
+    digitsequence  shift, and go to state 51
+    tk_begin       shift, and go to state 24
+    tk_case        shift, and go to state 52
+    tk_goto        shift, and go to state 53
+    tk_if          shift, and go to state 54
+    tk_repeat      shift, and go to state 55
+    tk_while       shift, and go to state 56
+    tk_for         shift, and go to state 57
+    tk_with        shift, and go to state 58
+    tk_read        shift, and go to state 59
+    tk_readln      shift, and go to state 60
+    tk_write       shift, and go to state 61
+    tk_writeln     shift, and go to state 62
 
-    quotedstringconstant      go to state 237
-    structuredtypeidentifier  go to state 251
-    pointertypeidentifier     go to state 252
-    quotedcharacterconstant   go to state 238
-    constant                  go to state 253
-    type                      go to state 424
-    simpletype                go to state 255
-    realtype                  go to state 256
-    realtypeidentifier        go to state 257
-    ordinaltype               go to state 258
-    stringtype                go to state 259
-    stringtypeidentifier      go to state 260
-    enumeratedtype            go to state 261
-    subrangetype              go to state 262
-    structuredtype            go to state 263
-    arraytype                 go to state 264
-    recordtype                go to state 265
-    settype                   go to state 266
-    filetype                  go to state 267
-    pointertype               go to state 268
+    $default  reduce using rule 174 (statement)
+
+    label                 go to state 63
+    functionidentifier    go to state 64
+    procedureidentifier   go to state 65
+    variablereference     go to state 66
+    variableidentifier    go to state 67
+    statement             go to state 424
+    simplestatement       go to state 69
+    assignmentstatement   go to state 70
+    procedurestatement    go to state 71
+    gotostatement         go to state 72
+    structuredstatement   go to state 73
+    compoundstatement     go to state 74
+    conditionalstatement  go to state 76
+    ifstatement           go to state 77
+    casestatement         go to state 78
+    repetitivestatement   go to state 79
+    repeatstatement       go to state 80
+    whilestatement        go to state 81
+    forstatement          go to state 82
+    withstatement         go to state 83
 
 
 state 417
 
-   91 variantpart: tk_case identifier ':' tagfieldtype . tk_of variants
+   75 arraytype: tk_array '[' indextypes ']' tk_of . type
 
-    tk_of  shift, and go to state 425
+    identifier             shift, and go to state 241
+    signednumber           shift, and go to state 234
+    ordinaltypeidentifier  shift, and go to state 242
+    comilla                shift, and go to state 235
+    tk_real                shift, and go to state 243
+    tk_string              shift, and go to state 244
+    tk_packed              shift, and go to state 245
+    tk_array               shift, and go to state 246
+    tk_record              shift, and go to state 247
+    tk_set                 shift, and go to state 248
+    tk_file                shift, and go to state 249
+    '+'                    shift, and go to state 236
+    '-'                    shift, and go to state 237
+    '('                    shift, and go to state 250
+    '^'                    shift, and go to state 251
+
+    quotedstringconstant      go to state 238
+    structuredtypeidentifier  go to state 252
+    pointertypeidentifier     go to state 253
+    quotedcharacterconstant   go to state 239
+    constant                  go to state 254
+    type                      go to state 425
+    simpletype                go to state 256
+    realtype                  go to state 257
+    realtypeidentifier        go to state 258
+    ordinaltype               go to state 259
+    stringtype                go to state 260
+    stringtypeidentifier      go to state 261
+    enumeratedtype            go to state 262
+    subrangetype              go to state 263
+    structuredtype            go to state 264
+    arraytype                 go to state 265
+    recordtype                go to state 266
+    settype                   go to state 267
+    filetype                  go to state 268
+    pointertype               go to state 269
 
 
 state 418
+
+   91 variantpart: tk_case identifier ':' tagfieldtype . tk_of variants
+
+    tk_of  shift, and go to state 426
+
+
+state 419
 
    90 variantpart: tk_case tagfieldtype tk_of variants .
 
     $default  reduce using rule 90 (variantpart)
 
 
-state 419
+state 420
 
    92 variants: variant .
    93         | variant . ';' variants
 
-    ';'  shift, and go to state 426
+    ';'  shift, and go to state 427
 
     ';'       [reduce using rule 92 (variants)]
     $default  reduce using rule 92 (variants)
 
 
-state 420
+state 421
 
    94 variant: constants . ':' '(' ')'
    95        | constants . ':' '(' fieldlist ')'
 
-    ':'  shift, and go to state 427
+    ':'  shift, and go to state 428
 
 
-state 421
+state 422
 
    83 fieldlist: fixedpart ';' variantpart ';' .
 
     $default  reduce using rule 83 (fieldlist)
 
 
-state 422
+state 423
 
-  209 forstatement: tk_for controlvariable assignment_op initialvalue tk_to finalvalue tk_do statement .
+  208 forstatement: tk_for controlvariable assignment_op initialvalue tk_to finalvalue tk_do statement .
+
+    $default  reduce using rule 208 (forstatement)
+
+
+state 424
+
+  209 forstatement: tk_for controlvariable assignment_op initialvalue tk_downto finalvalue tk_do statement .
 
     $default  reduce using rule 209 (forstatement)
 
 
-state 423
-
-  210 forstatement: tk_for controlvariable assignment_op initialvalue tk_downto finalvalue tk_do statement .
-
-    $default  reduce using rule 210 (forstatement)
-
-
-state 424
+state 425
 
    75 arraytype: tk_array '[' indextypes ']' tk_of type .
 
     $default  reduce using rule 75 (arraytype)
 
 
-state 425
+state 426
 
    91 variantpart: tk_case identifier ':' tagfieldtype tk_of . variants
 
-    identifier    shift, and go to state 232
-    signednumber  shift, and go to state 233
-    comilla       shift, and go to state 234
-    '+'           shift, and go to state 235
-    '-'           shift, and go to state 236
+    identifier    shift, and go to state 233
+    signednumber  shift, and go to state 234
+    comilla       shift, and go to state 235
+    '+'           shift, and go to state 236
+    '-'           shift, and go to state 237
 
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 302
-    variants                 go to state 428
-    variant                  go to state 419
-    constants                go to state 420
-
-
-state 426
-
-   93 variants: variant ';' . variants
-
-    identifier    shift, and go to state 232
-    signednumber  shift, and go to state 233
-    comilla       shift, and go to state 234
-    '+'           shift, and go to state 235
-    '-'           shift, and go to state 236
-
-    quotedstringconstant     go to state 237
-    quotedcharacterconstant  go to state 238
-    constant                 go to state 302
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 303
     variants                 go to state 429
-    variant                  go to state 419
-    constants                go to state 420
+    variant                  go to state 420
+    constants                go to state 421
 
 
 state 427
 
-   94 variant: constants ':' . '(' ')'
-   95        | constants ':' . '(' fieldlist ')'
+   93 variants: variant ';' . variants
 
-    '('  shift, and go to state 430
+    identifier    shift, and go to state 233
+    signednumber  shift, and go to state 234
+    comilla       shift, and go to state 235
+    '+'           shift, and go to state 236
+    '-'           shift, and go to state 237
+
+    quotedstringconstant     go to state 238
+    quotedcharacterconstant  go to state 239
+    constant                 go to state 303
+    variants                 go to state 430
+    variant                  go to state 420
+    constants                go to state 421
 
 
 state 428
+
+   94 variant: constants ':' . '(' ')'
+   95        | constants ':' . '(' fieldlist ')'
+
+    '('  shift, and go to state 431
+
+
+state 429
 
    91 variantpart: tk_case identifier ':' tagfieldtype tk_of variants .
 
     $default  reduce using rule 91 (variantpart)
 
 
-state 429
+state 430
 
    93 variants: variant ';' variants .
 
     $default  reduce using rule 93 (variants)
 
 
-state 430
+state 431
 
    94 variant: constants ':' '(' . ')'
    95        | constants ':' '(' . fieldlist ')'
 
     identifier  shift, and go to state 20
-    tk_case     shift, and go to state 328
-    ')'         shift, and go to state 431
+    tk_case     shift, and go to state 329
+    ')'         shift, and go to state 432
 
-    fieldlist          go to state 432
-    fixedpart          go to state 330
-    fielddeclarations  go to state 331
-    fielddeclaration   go to state 332
-    variantpart        go to state 333
-    identifierlist     go to state 334
+    fieldlist          go to state 433
+    fixedpart          go to state 331
+    fielddeclarations  go to state 332
+    fielddeclaration   go to state 333
+    variantpart        go to state 334
+    identifierlist     go to state 335
 
 
-state 431
+state 432
 
    94 variant: constants ':' '(' ')' .
 
     $default  reduce using rule 94 (variant)
 
 
-state 432
+state 433
 
    95 variant: constants ':' '(' fieldlist . ')'
 
-    ')'  shift, and go to state 433
+    ')'  shift, and go to state 434
 
 
-state 433
+state 434
 
    95 variant: constants ':' '(' fieldlist ')' .
 
