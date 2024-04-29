@@ -1,6 +1,7 @@
 %token identifier 
-%token anychar 
 %token signednumber 
+%token quotedstringconstant
+%token quotedcharacterconstant
 %token digitsequence 
 %token constantidentifier 
 %token unsignednumber 
@@ -89,9 +90,6 @@ program: programheading ';' optionalprogramuseclause block
 label: digitsequence
     ;
 
-quotedstringconstant:comilla stringcharacter comilla
-    ;
-
 functionidentifier: identifier
     ;
 
@@ -109,13 +107,6 @@ structuredtypeidentifier: identifier
     ;
 
 pointertypeidentifier: identifier
-    ;
-
-stringcharacter: anychar
-    |comilla comilla
-    ;
-
-quotedcharacterconstant: comilla stringcharacter comilla
     ;
 
 constantdeclaration: identifier '=' constant ';'

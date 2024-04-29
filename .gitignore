@@ -1,7 +1,11 @@
 /*.dSYM
-
+lex.yy.c
 main
-
+*.output
+parser.tab.c
+parser.tab.h
+scanner.cpp
+scanner.cpp
 *.pas
 
 a.out

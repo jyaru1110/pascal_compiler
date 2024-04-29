@@ -16,7 +16,9 @@ IDENTIFICADOR [a-zA-Z][a-zA-Z0-9_]*
 
 ORDINAL_TYPE_IDENTIFIER (integer)|(char)|(boolean)|(longint)
 
-ANYCHARBUTCOMILLA [^\']+
+STRINGCHARACTER \'[^\'\n]*\'
+STRINGQUOTES \'\'\'\'
+SINGLESTRINGCHARACTER \'[^\'\n]\'
 
 DIGIT [0-9]+
 DIGITOS_HEX [0-9a-fA-F]+
@@ -27,7 +29,6 @@ REAL_SIN_SIGNO {DIGIT}(.{DIGIT}|{FACTOR})
 NUMERO_SIN_SIGNO {ENTERO_SIN_SIGNO}|{REAL_SIN_SIGNO}
 NUMERO_CON_SIGNO {SIGNO}?{NUMERO_SIN_SIGNO}
 CONSTANTE_CADENA \"[^\"]+\"|\'[^\']+\'
-COMILLA \'
 
 LINEA [\n]
 TABULADOR [\t]
@@ -43,8 +44,16 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 
 %%
 
-{COMILLA} {
-	return comilla;
+{STRINGCHARACTER} {
+  return quotedstringconstant;
+}
+
+{STRINGQUOTES} {
+  return quotedstringconstant;
+}
+
+{SINGLESTRINGCHARACTER} {
+  return quotedcharacterconstant;
 }
 
 {ORDINAL_TYPE_IDENTIFIER} {
