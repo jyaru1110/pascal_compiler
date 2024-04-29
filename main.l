@@ -8,7 +8,7 @@ int linea=1;
 
 INCIO_COMENTARIO \{|(\(\*)
 FIN_COMENTARIO \}|(\*\))
-PALABRA [^}]+
+PALABRA [^}^\n]+
 
 SIMBOLOS_ESCRITURA \@|\#|\+|\-|\*|\/|\<|\>|\^|\;|\=|\,|\(|\)|\[|\]|\:|\.
 
@@ -134,6 +134,9 @@ LINEA [\n]
 
 <comentario>{FIN_COMENTARIO} {
     BEGIN(INITIAL);
+}
+<comentario>{LINEA} {
+	linea++;
 }
 
 <comentario>{PALABRA} {
