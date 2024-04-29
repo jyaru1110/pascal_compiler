@@ -59,10 +59,6 @@ LINEA [\n]
 	return digitsequence;
 }
 
-{REAL_SIN_SIGNO} {
-	return constantidentifier;
-}
-
 {NUMERO_SIN_SIGNO} {
 	return unsignednumber;
 }

@@ -3,10 +3,8 @@
 %token quotedstringconstant
 %token quotedcharacterconstant
 %token digitsequence 
-%token constantidentifier 
 %token unsignednumber 
 %token ordinaltypeidentifier
-%token comilla
 %token tk_program
 %token tk_begin
 %token tk_uses
@@ -113,8 +111,8 @@ constantdeclaration: identifier '=' constant ';'
     ;
 
 constant: identifier
-    | '+' constantidentifier
-    | '-' constantidentifier
+    | '+' identifier
+    | '-' identifier
     | signednumber
     | quotedstringconstant
     | quotedcharacterconstant
@@ -335,7 +333,7 @@ factor: '@' variablereference
 unsignedconstant: unsignednumber
     | quotedstringconstant
     | tk_nil
-    | constantidentifier
+    | identifier
     ;
 
 term: factor
