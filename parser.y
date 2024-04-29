@@ -259,7 +259,7 @@ fixedpart: fielddeclarations
     ;
 
 fielddeclarations: fielddeclaration
-    | fielddeclaration ';' fielddeclarations
+    | fielddeclarations ';' fielddeclaration
     ;
 
 fielddeclaration: identifierlist ':' type

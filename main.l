@@ -59,6 +59,10 @@ LINEA [\n]
 	return digitsequence;
 }
 
+{ENTERO_SIN_SIGNO} {
+  return unsignedinteger;
+}
+
 {NUMERO_SIN_SIGNO} {
 	return unsignednumber;
 }
@@ -67,9 +71,7 @@ LINEA [\n]
 	return signednumber;
 }
 
-{ENTERO_SIN_SIGNO} {
-  return unsignedinteger;
-}
+
 
 "program" { return tk_program; }
 "begin" { return tk_begin; }
@@ -138,9 +140,6 @@ LINEA [\n]
 
 <comentario>{FIN_COMENTARIO} {
     BEGIN(INITIAL);
-}
-<comentario>{LINEA} {
-	linea++;
 }
 
 <comentario>{PALABRA} {
