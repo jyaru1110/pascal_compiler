@@ -182,8 +182,8 @@ optionalstatementpart: statementpart
 ;
 
 typedeclaration: identifier '=' type ';'
-    identifier '=' identifier ';'
-    ;
+  | identifier '=' identifier ';'
+;
 
 type: simpletype
     | structuredtype
