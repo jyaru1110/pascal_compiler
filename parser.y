@@ -1,10 +1,11 @@
 %token identifier 
 %token signednumber 
 %token quotedstringconstant
+%token unsignedinteger
 %token quotedcharacterconstant
 %token digitsequence 
 %token unsignednumber 
-%token ordinaltypeidentifier
+%token ordinaltypereservedwords
 %token tk_program
 %token tk_begin
 %token tk_uses
@@ -94,8 +95,8 @@ procedureidentifier: tk_read
     | tk_writeln
     ;
 
-typeidentifier: identifier
-    ;
+typeidentifier: type
+;
 
 
 constantdeclaration: identifier '=' constant ';'
@@ -192,8 +193,11 @@ simpletype: ordinaltype
 realtype: realtypeidentifier
     ;
 
-realtypeidentifier: tk_real
-    ;
+realtypeidentifier: tk_real | identifier
+;
+
+ordinaltypeidentifier: ordinaltypereservedwords | identifier
+;
 
 ordinaltype: subrangetype
     | enumeratedtype
@@ -201,17 +205,18 @@ ordinaltype: subrangetype
     ;
 
 stringtype: tk_string '[' sizeattribute ']'
-    ;
+  | identifier
+;
 
-sizeattribute: unsignednumber
+sizeattribute: unsignedinteger
     ;
 
 enumeratedtype: '(' identifierlist ')'
     ;
 
 subrangetype: constant range_op constant
-    | identifier range_op identifier
-    ;
+  | identifier range_op identifier
+;
 
 structuredtype: arraytype
     | settype
@@ -228,7 +233,7 @@ arraytype: tk_array '[' indextypes ']' tk_of type
     ;
 
 indextypes: indextype
-    | indextype indextypes
+    | indextype ',' indextypes
     ;
 
 indextype: ordinaltype
@@ -239,6 +244,7 @@ recordtype: tk_record tk_end
     ;
 
 fieldlist: fixedpart
+    | fixedpart ';'
     | fixedpart ';' variantpart
     | fixedpart ';' variantpart ';'
     | variantpart
@@ -268,10 +274,10 @@ variant: constants ':' '(' ')'
     ;
 
 constants: constant
-    | constant ',' constants
-    | identifier
-    | identifier ',' constants
-    ;
+  | constant ',' constants
+  | identifier
+  | identifier ',' constants
+;
 
 tagfieldtype: ordinaltypeidentifier
     ;

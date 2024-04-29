@@ -52,7 +52,7 @@ LINEA [\n]
 
 
 {ORDINAL_TYPE_IDENTIFIER} {
-	return ordinaltypeidentifier;
+	return ordinaltypereservedwords;
 }
 
 {DIGIT} {
@@ -65,6 +65,10 @@ LINEA [\n]
 
 {NUMERO_CON_SIGNO} {
 	return signednumber;
+}
+
+{ENTERO_SIN_SIGNO} {
+  return unsignedinteger;
 }
 
 "program" { return tk_program; }
