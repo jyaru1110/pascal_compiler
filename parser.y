@@ -458,9 +458,6 @@ cases: case ',' cases
 
 case: constants ':' statement;
 
-constants: constant ',' constants
-    | constant
-    ;
 
 otherwiseclause: ';' tk_otherwise statement
     ;
