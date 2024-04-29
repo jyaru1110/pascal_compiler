@@ -10,7 +10,7 @@ INCIO_COMENTARIO \{|(\(\*)
 FIN_COMENTARIO \}|(\*\))
 PALABRA [^}]+
 
-SIMBOLOS_ESCRITURA \@|\#|\+|\-|\*|\/|\<|\>|\^|\;|\=|\,|\(|\)|\[|\]|\:
+SIMBOLOS_ESCRITURA \@|\#|\+|\-|\*|\/|\<|\>|\^|\;|\=|\,|\(|\)|\[|\]|\:|\.
 
 IDENTIFICADOR [a-zA-Z][a-zA-Z0-9_]*
 
@@ -138,6 +138,7 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 		}
 
 [ \t] ;
+[\r] ;
 
 {INCIO_COMENTARIO} BEGIN(comentario);
 
@@ -156,7 +157,9 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 ":=" { return assignment_op; }
 ".." { return range_op; }
 
+
 . {
+	printf("Caracter no valido: %s\n", yytext);
 	yyerror("Caracter no valido");
 }
 

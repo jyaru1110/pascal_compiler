@@ -423,7 +423,9 @@ structuredstatement: compoundstatement
     | withstatement
     ;
 
-compoundstatement: tk_begin statements tk_end;
+compoundstatement: tk_begin statements tk_end 
+    | tk_begin statements tk_end '.'
+    ;
 
 statements : statement
            | statements ';' statement
