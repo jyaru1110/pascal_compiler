@@ -198,10 +198,10 @@ simpletype: ordinaltype
 realtype: realtypeidentifier
     ;
 
-realtypeidentifier: tk_real | identifier
+realtypeidentifier: tk_real
 ;
 
-ordinaltypeidentifier: ordinaltypereservedwords | identifier
+ordinaltypeidentifier: ordinaltypereservedwords
 ;
 
 ordinaltype: subrangetype
@@ -210,7 +210,6 @@ ordinaltype: subrangetype
     ;
 
 stringtype: tk_string '[' sizeattribute ']'
-  | identifier
 ;
 
 sizeattribute: unsignedinteger
@@ -231,10 +230,10 @@ structuredtype: arraytype
     | tk_packed settype
     | tk_packed filetype
     | tk_packed recordtype
-    | identifier
     ;
 
 arraytype: tk_array '[' indextypes ']' tk_of type
+    | tk_array '[' indextypes ']' tk_of identifier
     ;
 
 indextypes: indextype
@@ -264,6 +263,7 @@ fielddeclarations: fielddeclaration
     ;
 
 fielddeclaration: identifierlist ':' type
+    | identifierlist ':' identifier
     ;
 
 variantpart: tk_case tagfieldtype tk_of variants
@@ -285,6 +285,7 @@ constants: constant
 ;
 
 tagfieldtype: ordinaltypeidentifier
+    | identifier
     ;
 
 settype: tk_set tk_of ordinaltype
@@ -292,6 +293,7 @@ settype: tk_set tk_of ordinaltype
 
 filetype: tk_file
     | tk_file tk_of type
+    | tk_file tk_of identifier
     ;
 
 pointertype: '^' basetype
