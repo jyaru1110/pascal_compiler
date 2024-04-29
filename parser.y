@@ -88,11 +88,7 @@ program: programheading ';' optionalprogramuseclause block
 label: digitsequence
     ;
 
-functionidentifier: identifier
-    ;
-
-procedureidentifier: identifier
-    | tk_read
+procedureidentifier: tk_read
     | tk_readln
     | tk_write
     | tk_writeln
@@ -101,17 +97,12 @@ procedureidentifier: identifier
 typeidentifier: identifier
     ;
 
-structuredtypeidentifier: identifier
-    ;
-
-pointertypeidentifier: identifier
-    ;
 
 constantdeclaration: identifier '=' constant ';'
+    | identifier '=' identifier ';'
     ;
 
-constant: identifier
-    | '+' identifier
+constant: '+' identifier
     | '-' identifier
     | signednumber
     | quotedstringconstant
@@ -185,6 +176,7 @@ optionalstatementpart: statementpart
 ;
 
 typedeclaration: identifier '=' type ';'
+    identifier '=' identifier ';'
     ;
 
 type: simpletype
@@ -209,12 +201,7 @@ ordinaltype: subrangetype
     ;
 
 stringtype: tk_string '[' sizeattribute ']'
-    | stringtypeidentifier
     ;
-
-stringtypeidentifier: identifier
-    ;
-
 
 sizeattribute: unsignednumber
     ;
@@ -223,6 +210,7 @@ enumeratedtype: '(' identifierlist ')'
     ;
 
 subrangetype: constant range_op constant
+    | identifier range_op identifier
     ;
 
 structuredtype: arraytype
@@ -233,7 +221,7 @@ structuredtype: arraytype
     | tk_packed settype
     | tk_packed filetype
     | tk_packed recordtype
-    | structuredtypeidentifier
+    | identifier
     ;
 
 arraytype: tk_array '[' indextypes ']' tk_of type
@@ -281,6 +269,8 @@ variant: constants ':' '(' ')'
 
 constants: constant
     | constant ',' constants
+    | identifier
+    | identifier ',' constants
     ;
 
 tagfieldtype: ordinaltypeidentifier
@@ -294,17 +284,16 @@ filetype: tk_file
     ;
 
 pointertype: '^' basetype
-    | pointertypeidentifier
     ;
 
 basetype: typeidentifier
     ;
 
 variabledeclaration: identifierlist ':' type ';'
+    | identifierlist ':' identifier ';'
     ;
 
-variablereference: variableidentifier
-    | variableidentifier qualifiers
+variablereference: identifier qualifiers
     ;
 
 identifierlist:
@@ -316,13 +305,9 @@ qualifiers : qualifier
     | qualifier qualifiers
     ;
 
-variableidentifier: identifier
-    ;
-
 qualifier: index
     | fielddesignator
-    | filebuffersymbol
-    | pointerobjectsymbol
+    | '^'
     ;
 
 index : '[' expressions']'
@@ -335,14 +320,8 @@ expressions: expression
 fielddesignator: '.' identifier
     ;
 
-filebuffersymbol: '^'
-    ;
-
-pointerobjectsymbol: '^'
-    ;
-
 factor: '@' variablereference
-    | variablereference
+    | '@' identifier
     | unsignedconstant
     | functioncall
     | setconstructor
@@ -351,9 +330,7 @@ factor: '@' variablereference
     ;
 
 unsignedconstant: unsignednumber
-    | quotedstringconstant
     | tk_nil
-    | identifier
     ;
 
 term: factor
@@ -362,6 +339,21 @@ term: factor
     | factor tk_div term
     | factor tk_mod term
     | factor tk_and term
+    | identifier '*' term
+    | identifier '/' term
+    | identifier tk_div term
+    | identifier tk_mod term
+    | identifier tk_and term
+    | quotedstringconstant '*' term
+    | quotedstringconstant '/' term
+    | quotedstringconstant tk_div term
+    | quotedstringconstant tk_mod term
+    | quotedstringconstant tk_and term
+    | variablereference '*' term
+    | variablereference '/' term
+    | variablereference tk_div term
+    | variablereference tk_mod term
+    | variablereference tk_and term
     ;
 
 simpleexpression: '+' unsignedexpression
@@ -383,22 +375,22 @@ expression: simpleexpression comparison_op simpleexpression
     | simpleexpression
     ;
 
-functioncall: functionidentifier
-    | functionidentifier actualparameterlist
-    ;
+functioncall: identifier actualparameterlist;
 
 actualparameterlist: '(' actualparametergroup ')'
     ;
 
 actualparametergroup: actualparameter
     | actualparametergroup ',' actualparameter
+    | identifier
+    | actualparametergroup ',' identifier
+    | quotedstringconstant
+    | actualparametergroup ',' quotedstringconstant
     ;
 
 actualparameter: expression 
     | variablereference
     | procedureidentifier
-    | functionidentifier
-    | quotedstringconstant
     ;
 
 setconstructor: '[' membergroups ']'
@@ -426,10 +418,11 @@ simplestatement: assignmentstatement
     ;
 
 assignmentstatement: variablereference assignment_op expression
-    | functionidentifier assignment_op expression;
+    | identifier assignment_op expression;
 
 procedurestatement: procedureidentifier
     | procedureidentifier actualparameterlist
+    | identifier actualparameterlist
     ;
 
 gotostatement: tk_goto label
@@ -484,11 +477,8 @@ repeatstatement: tk_repeat statements tk_until expression
 whilestatement: tk_while expression tk_do statement
     ;
 
-forstatement: tk_for controlvariable assignment_op initialvalue tk_to finalvalue tk_do statement
-    | tk_for controlvariable assignment_op initialvalue tk_downto finalvalue tk_do statement
-    ;
-
-controlvariable: variableidentifier
+forstatement: tk_for identifier assignment_op initialvalue tk_to finalvalue tk_do statement
+    | tk_for identifier assignment_op initialvalue tk_downto finalvalue tk_do statement
     ;
 
 initialvalue: expression
@@ -505,6 +495,7 @@ recordvariablereferences: recordvariablereference
     ;
 
 recordvariablereference: variablereference
+    | identifier
     ;
 
 proceduredeclaration: procedureheading ';' procedurebody ';' 
@@ -535,7 +526,7 @@ functionheading: tk_function identifier optionalformalparameterlist ':' resultty
 
 resulttype: ordinaltypeidentifier 
   | realtypeidentifier 
-  | pointertypeidentifier /*CHECAR ESTA AL FINAL*/
+  | identifier
 ;
 
 formalparameter: parameterdeclaration
