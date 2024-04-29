@@ -118,13 +118,8 @@ constant: identifier
     | quotedcharacterconstant
     ;
 
-block: statementpart
-    | procedureandfunctiondeclarationpart block
-    | variabledeclarationpart block
-    | typedeclarationpart block
-    | constantdeclarationpart block
-    | labeldeclarationpart
-    ;
+block: optionallabeldeclarationpart optionalconstantdeclarationpart optionaltypedeclarationpart optionalvariabledeclarationpart optionalprocedureandfunctiondeclarationpart optionalstatementpart
+;
 
 labeldeclarationpart: tk_label labels ';'
     ;
@@ -133,12 +128,20 @@ labels: label
     | label ',' labels
     ;
 
+optionallabeldeclarationpart: labeldeclarationpart 
+  |
+;
+
 constantdeclarationpart: tk_const constantdeclarations
     ;
 
 constantdeclarations: constantdeclaration
     | constantdeclaration constantdeclarations
     ;
+
+optionalconstantdeclarationpart: constantdeclarationpart
+  |
+;
 
 typedeclarationpart: tk_type typedeclarations
     ;
@@ -147,22 +150,39 @@ typedeclarations: typedeclaration
     | typedeclaration typedeclarations
     ;
 
+optionaltypedeclarationpart: typedeclarationpart
+  |
+;
+
 variabledeclarationpart: tk_var variabledeclarations
-    ;
+;
 
 variabledeclarations: variabledeclaration
     | variabledeclaration variabledeclarations
-    ;
-
-procedureandfunctiondeclarationpart: proceduredeclaration
-    |functiondeclaration 
-    |procedureandfunctiondeclarationpart functiondeclaration
-    |procedureandfunctiondeclarationpart proceduredeclaration 
 ;
 
+optionalvariabledeclarationpart: variabledeclarationpart
+  |
+;
+
+procedureandfunctiondeclarationpart: procedureandfunction
+  | procedureandfunction procedureandfunctiondeclarationpart
+;
+
+procedureandfunction: proceduredeclaration
+  | functiondeclaration
+;
+
+optionalprocedureandfunctiondeclarationpart: procedureandfunctiondeclarationpart
+  |
+;
 
 statementpart: compoundstatement
     ;
+
+optionalstatementpart: statementpart
+  |
+;
 
 typedeclaration: identifier '=' type ';'
     ;
