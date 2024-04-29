@@ -78,6 +78,11 @@ int yyerror(const char *s);
     int numero;
 }
 
+%left '=' comparison_op '<' '>' tk_in
+%left '+' '-' tk_or
+%left '*' '/' tk_div tk_mod tk_and
+%left '@' tk_not
+
 %%
 
 s: program | regularunit;
