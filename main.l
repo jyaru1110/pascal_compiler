@@ -16,7 +16,7 @@ IDENTIFICADOR [a-zA-Z][a-zA-Z0-9_]*
 
 ORDINAL_TYPE_IDENTIFIER (integer)|(char)|(boolean)|(longint)
 
-ANYCHARBUTCOMILLA [^\']+
+ANYCHARBUTCOMILLA [^\']?
 
 DIGIT [0-9]+
 DIGITOS_HEX [0-9a-fA-F]+
@@ -146,10 +146,13 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 ":=" { return assignment_op; }
 ".." { return range_op; }
 
+{ANYCHARBUTCOMILLA} {
+	return anychar;
+}
+
 . {
 	yyerror("Caracter no valido");
 }
-
 
 
 %%

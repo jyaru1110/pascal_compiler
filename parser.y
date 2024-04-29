@@ -89,7 +89,11 @@ program: programheading ';' optionalprogramuseclause block
 label: digitsequence
     ;
 
-quotedstringconstant:comilla stringcharacter comilla
+quotedstringconstant:comilla stringcharacters comilla
+    ;
+
+stringcharacters: stringcharacter
+    | stringcharacters stringcharacter
     ;
 
 functionidentifier: identifier
@@ -268,10 +272,6 @@ variants: variant
 
 variant: constants ':' '(' ')'
     | constants ':' '(' fieldlist ')'
-    ;
-
-constants: constant
-    | constant ',' constants
     ;
 
 tagfieldtype: ordinaltypeidentifier
