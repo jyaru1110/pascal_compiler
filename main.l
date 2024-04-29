@@ -44,6 +44,10 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
 
 %%
 
+{SINGLESTRINGCHARACTER} {
+  return quotedcharacterconstant;
+}
+
 {STRINGCHARACTER} {
   return quotedstringconstant;
 }
@@ -52,9 +56,6 @@ ELEMENTOS [a-zA-Z][a-zA-Z0-9]*
   return quotedstringconstant;
 }
 
-{SINGLESTRINGCHARACTER} {
-  return quotedcharacterconstant;
-}
 
 {ORDINAL_TYPE_IDENTIFIER} {
 	return ordinaltypeidentifier;
