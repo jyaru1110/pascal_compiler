@@ -14,7 +14,7 @@ SIMBOLOS_ESCRITURA \@|\#|\+|\-|\*|\/|\<|\>|\^|\;|\=|\,|\(|\)|\[|\]|\:|\.
 
 IDENTIFICADOR [a-zA-Z][a-zA-Z0-9_]*
 
-ORDINAL_TYPE_IDENTIFIER (integer)|(char)|(boolean)|(longint)
+ORDINAL_TYPE_IDENTIFIER (integer)|(char)|(boolean)|(longint)|(word)
 
 STRINGCHARACTER \'[^\'\n]*\'
 STRINGQUOTES \'\'\'\'
