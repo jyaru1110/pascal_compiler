@@ -72,7 +72,6 @@ LINEA [\n]
 }
 
 
-
 "program" { return tk_program; }
 "begin" { return tk_begin; }
 "uses" { return tk_uses; }
@@ -83,7 +82,6 @@ LINEA [\n]
 "const" { return tk_const; }
 "type" { return tk_type; }
 "real" { return tk_real; }
-"word" { return tk_word; }
 "true" { return tk_true; }
 "false" { return tk_false; }
 "string" { return tk_string; }
