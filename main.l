@@ -116,6 +116,9 @@ LINEA [\n]
 "readln" { return tk_readln; }
 "write" { return tk_write; }
 "writeln" { return tk_writeln; }
+"assign" { return tk_assign;}
+"close" { return tk_close;}
+"reset" {return tk_reset;}
 "in" { return tk_in; }
 "or" { return tk_or; }
 "div" { return tk_div; }

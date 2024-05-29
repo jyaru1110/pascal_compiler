@@ -60,6 +60,9 @@
 %token comparison_op
 %token assignment_op
 %token range_op
+%token tk_assign
+%token tk_close
+%token tk_reset
 
 %{
 #include <stdio.h>
@@ -98,6 +101,9 @@ procedureidentifier: tk_read
     | tk_readln
     | tk_write
     | tk_writeln
+    | tk_assign
+    | tk_close
+    | tk_reset
     ;
 
 typeidentifier: type
@@ -453,6 +459,7 @@ structuredstatement: compoundstatement
 
 compoundstatement: tk_begin statements tk_end 
     | tk_begin statements tk_end '.'
+    | tk_begin statements tk_end ';'
     ;
 
 statements : statement
