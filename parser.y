@@ -416,6 +416,7 @@ actualparametergroup: actualparameter
     | actualparametergroup ',' identifier
     | quotedstringconstant
     | actualparametergroup ',' quotedstringconstant
+    |
     ;
 
 actualparameter: expression 
@@ -548,7 +549,6 @@ procedureheading: tk_procedure identifier optionalformalparameterlist
 ;
 
 optionalformalparameterlist: formalparameterlist
-    |'('')'
     |
     ;
 

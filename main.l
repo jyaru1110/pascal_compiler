@@ -56,7 +56,6 @@ LINEA [\n]
 }
 
 {DIGIT} {
-	printf("%s",yytext);
 	return digitsequence;
 }
 
@@ -65,7 +64,6 @@ LINEA [\n]
 }
 
 {NUMERO_SIN_SIGNO} {
-	printf("%s",yytext);
 	return unsignednumber;
 }
 
@@ -109,13 +107,8 @@ LINEA [\n]
 "until" { return tk_until; }
 "while" { return tk_while; }
 "do" { return tk_do; }
-"for" {
-	printf("%s",yytext);
-	return tk_for; 
-	}
-"to" { 
-	printf("%s",yytext);
-	return tk_to; }
+"for" { return tk_for; }
+"to" { return tk_to; }
 "downto" { return tk_downto; }
 "with" { return tk_with; }
 "nil" { return tk_nil; }
@@ -134,7 +127,6 @@ LINEA [\n]
 "not" { return tk_not; }
 
 {IDENTIFICADOR} {
-	printf("%s",yytext);
 	return identifier;
 }
 
@@ -161,7 +153,6 @@ LINEA [\n]
 
 "<>"|"<="|">=" { return comparison_op; }
 ":=" { 
-	printf("%s",yytext);
 	return assignment_op; 
 	}
 ".." { return range_op; }
