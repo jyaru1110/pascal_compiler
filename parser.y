@@ -545,8 +545,9 @@ procedureheading: tk_procedure identifier optionalformalparameterlist
 ;
 
 optionalformalparameterlist: formalparameterlist
-  |
-;
+    |'('')'
+    |
+    ;
 
 functiondeclaration: functionheading ';' functionbody ';'
 ;
