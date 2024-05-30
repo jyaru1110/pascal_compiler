@@ -360,6 +360,7 @@ factor: '@' variablereference
 
 unsignedconstant: unsignednumber
     | tk_nil
+    | digitsequence
     ;
 
 term: factor
@@ -513,6 +514,8 @@ whilestatement: tk_while expression tk_do statement
 
 forstatement: tk_for identifier assignment_op initialvalue tk_to finalvalue tk_do statement
     | tk_for identifier assignment_op initialvalue tk_downto finalvalue tk_do statement
+    | tk_for identifier assignment_op initialvalue tk_to identifier tk_do statement
+    | tk_for identifier assignment_op initialvalue tk_downto identifier tk_do statement
     ;
 
 initialvalue: expression
