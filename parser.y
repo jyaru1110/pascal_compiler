@@ -119,6 +119,7 @@ constant: '+' identifier
     | signednumber
     | quotedstringconstant
     | quotedcharacterconstant
+    | digitsequence
     ;
 
 block: optionallabeldeclarationpart optionalconstantdeclarationpart optionaltypedeclarationpart optionalvariabledeclarationpart optionalprocedureandfunctiondeclarationpart optionalstatementpart
@@ -240,7 +241,16 @@ structuredtype: arraytype
 
 arraytype: tk_array '[' indextypes ']' tk_of type
     | tk_array '[' indextypes ']' tk_of identifier
+    | tk_array '[' ranges ']' tk_of type
+    | tk_array '[' ranges ']' tk_of identifier
     ;
+
+ranges: subrangetype
+    | subrangetype ',' ranges
+    ;
+    
+
+
 
 indextypes: indextype
     | indextype ',' indextypes
@@ -523,6 +533,7 @@ recordvariablereference: variablereference
     ;
 
 proceduredeclaration: procedureheading ';' procedurebody ';' 
+| procedureheading ';' procedurebody
 ;
 
 procedurebody: block

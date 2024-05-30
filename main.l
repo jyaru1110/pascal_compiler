@@ -134,7 +134,8 @@ LINEA [\n]
 	linea++;
 		}
 
-[ \t] ;
+[ \t] {
+};
 [\r] ;
 
 {INCIO_COMENTARIO} BEGIN(comentario);
