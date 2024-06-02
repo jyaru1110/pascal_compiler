@@ -455,7 +455,6 @@ assignmentstatement: variablereference assignment_op expression
     | identifier assignment_op expression
     | identifier assignment_op tk_false
     | identifier assignment_op tk_true
-    | identifier assignment_op identifier
     ;
 
 procedurestatement: procedureidentifier
