@@ -415,8 +415,6 @@ actualparameterlist: '(' actualparametergroup ')'
 
 actualparametergroup: actualparameter
     | actualparametergroup ',' actualparameter
-    | identifier
-    | actualparametergroup ',' identifier
     | quotedstringconstant
     | actualparametergroup ',' quotedstringconstant
     |
