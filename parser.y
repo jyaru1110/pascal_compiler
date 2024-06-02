@@ -1,5 +1,4 @@
 %token identifier 
-%token signednumber 
 %token quotedstringconstant
 %token unsignedinteger
 %token quotedcharacterconstant
@@ -63,6 +62,7 @@
 %token tk_assign
 %token tk_close
 %token tk_reset
+%token sign
 
 %{
 #include <stdio.h>
@@ -116,7 +116,9 @@ constantdeclaration: identifier '=' constant ';'
 
 constant: '+' identifier
     | '-' identifier
-    | signednumber
+    | sign unsignednumber
+    | sign unsignedinteger
+    | sign digitsequence
     | quotedstringconstant
     | quotedcharacterconstant
     | digitsequence
@@ -386,15 +388,16 @@ term: factor
     | variablereference tk_and term
     ;
 
-simpleexpression: '+' unsignedexpression
-    | '-' unsignedexpression
-    | unsignedexpression
+simpleexpression: unsignedexpression 
+    |sign unsignedexpression
     ;
 
-unsignedexpression: term '+' unsignedexpression
-    | term '-' unsignedexpression
+unsignedexpression: term sign unsignedexpression
     | term tk_or unsignedexpression
     | term
+    | identifier sign unsignedexpression
+    | identifier tk_or unsignedexpression
+    | identifier
     ;
 
 expression: simpleexpression comparison_op simpleexpression
@@ -403,7 +406,7 @@ expression: simpleexpression comparison_op simpleexpression
     | simpleexpression '>' simpleexpression
     | simpleexpression '<' simpleexpression
     | simpleexpression
-    ;
+    ; 
 
 functioncall: identifier actualparameterlist;
 
