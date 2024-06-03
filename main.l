@@ -38,14 +38,17 @@ LINEA [\n]
 %%
 
 {SINGLESTRINGCHARACTER} {
+	printf("single: %s\n", yytext);
   return quotedcharacterconstant;
 }
 
 {STRINGCHARACTER} {
+	printf("string: %s\n", yytext);
   return quotedstringconstant;
 }
 
 {STRINGQUOTES} {
+	printf("quotes: %s\n", yytext);
   return quotedstringconstant;
 }
 
