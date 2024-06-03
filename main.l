@@ -38,17 +38,14 @@ LINEA [\n]
 %%
 
 {SINGLESTRINGCHARACTER} {
-	printf("single: %s\n", yytext);
   return quotedcharacterconstant;
 }
 
 {STRINGCHARACTER} {
-	printf("string: %s\n", yytext);
   return quotedstringconstant;
 }
 
 {STRINGQUOTES} {
-	printf("quotes: %s\n", yytext);
   return quotedstringconstant;
 }
 
@@ -153,7 +150,9 @@ LINEA [\n]
 	return *yytext;
 }
 
-"<>"|"<="|">=" { return comparison_op; }
+"<>"|"<="|">=" {
+	return comparison_op; 
+}
 ":=" { 
 	return assignment_op; 
 	}

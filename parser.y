@@ -386,6 +386,9 @@ term: factor
     | variablereference tk_div term
     | variablereference tk_mod term
     | variablereference tk_and term
+    | identifier
+    | quotedstringconstant
+    | quotedcharacterconstant
     ;
 
 simpleexpression: unsignedexpression 
@@ -397,7 +400,6 @@ unsignedexpression: term sign unsignedexpression
     | term
     | identifier sign unsignedexpression
     | identifier tk_or unsignedexpression
-    | identifier
     ;
 
 expression: simpleexpression comparison_op simpleexpression
@@ -415,10 +417,6 @@ actualparameterlist: '(' actualparametergroup ')'
 
 actualparametergroup: actualparameter
     | actualparametergroup ',' actualparameter
-    | quotedstringconstant
-    | actualparametergroup ',' quotedstringconstant
-    | quotedcharacterconstant
-    | actualparametergroup ',' quotedcharacterconstant
     |
     ;
 
@@ -465,15 +463,14 @@ procedurestatement: procedureidentifier
 gotostatement: tk_goto label
     ;
 
-structuredstatement: compoundstatement {printf("compound\n");}
+structuredstatement: compoundstatement
     | conditionalstatement
     | repetitivestatement
     | withstatement
     ;
 
-compoundstatement: tk_begin statements tk_end 
-    | tk_begin statements tk_end '.'
-    | tk_begin statements tk_end ';' 
+compoundstatement: tk_begin statements tk_end
+    | tk_begin statements tk_end '.' 
     ;
 
 statements : statement
@@ -515,10 +512,10 @@ repeatstatement: tk_repeat statements tk_until expression
 whilestatement: tk_while expression tk_do statement
     ;
 
-forstatement: tk_for identifier assignment_op initialvalue tk_to finalvalue tk_do statement {printf("for\n");}
-    | tk_for identifier assignment_op initialvalue tk_downto finalvalue tk_do statement
-    | tk_for identifier assignment_op initialvalue tk_to identifier tk_do statement
-    | tk_for identifier assignment_op initialvalue tk_downto identifier tk_do statement
+forstatement: tk_for identifier assignment_op initialvalue tk_to finalvalue tk_do statements
+    | tk_for identifier assignment_op initialvalue tk_downto finalvalue tk_do statements
+    | tk_for identifier assignment_op initialvalue tk_to identifier tk_do statements
+    | tk_for identifier assignment_op initialvalue tk_downto identifier tk_do statements
     ;
 
 initialvalue: expression
