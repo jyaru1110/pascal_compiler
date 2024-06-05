@@ -24,9 +24,9 @@ DIGIT [0-9]+
 DIGITOS_HEX [0-9a-fA-F]+
 SIGNO \+|\-
 FACTOR [eE]SIGNO?DIGIT
-ENTERO_SIN_SIGNO {DIGIT}|${DIGITOS_HEX}
-REAL_SIN_SIGNO DIGIT\.(DIGIT|FACTOR)
-NUMERO_SIN_SIGNO {ENTERO_SIN_SIGNO}|{REAL_SIN_SIGNO}
+ENTERO_SIN_SIGNO DIGIT|$DIGITOS_HEX
+REAL_SIN_SIGNO [0-9]+\.([0-9]+|FACTOR)
+NUMERO_SIN_SIGNO ENTERO_SIN_SIGNO|REAL_SIN_SIGNO
 
 LINEA [\n]
 
@@ -54,16 +54,16 @@ LINEA [\n]
 	return ordinaltypereservedwords;
 }
 
+{REAL_SIN_SIGNO} {
+	return unsignednumber;
+}
+
 {DIGIT} {
 	return digitsequence;
 }
 
 {ENTERO_SIN_SIGNO} {
   return unsignedinteger;
-}
-
-{REAL_SIN_SIGNO} {
-	return unsignednumber;
 }
 
 {SIGNO} {
