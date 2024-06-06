@@ -95,12 +95,8 @@ LINEA [\n]
 "var" { return tk_var; }
 "forward" { return tk_forward; }
 "external" { return tk_external; }
-"function" { 
-	return tk_function; 
-}
-"procedure" { 
-	return tk_procedure; 
-}
+"function" { return tk_function; }
+"procedure" { return tk_procedure; }
 "file" { return tk_file; }
 "goto" { return tk_goto; }
 "if" { return tk_if; }
@@ -122,6 +118,8 @@ LINEA [\n]
 "assign" { return tk_assign;}
 "close" { return tk_close;}
 "reset" {return tk_reset;}
+"inc" { return tk_inc;}
+"dec" { return tk_dec;}
 "in" { return tk_in; }
 "or" { return tk_or; }
 "div" { return tk_div; }

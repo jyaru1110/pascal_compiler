@@ -63,6 +63,8 @@
 %token tk_close
 %token tk_reset
 %token sign
+%token tk_inc
+%token tk_dec
 
 %{
 #include <stdio.h>
@@ -162,6 +164,36 @@ void quitar_ambito_anterior(){
     ambito[size] = '\0';
     current_ambito = ambito;
 }
+
+void check_identifier_exists(char *id_to_check){
+    string key = id_to_check + string(current_ambito);
+    if (tabla_simbolos.find(key) != tabla_simbolos.end())
+    {
+        return;
+    }
+    char *ambito = current_ambito;
+    while(strchr(ambito, '.') != NULL){
+        char *p = strrchr(ambito, '.');
+        int size = p - ambito;
+        char *ambito_anterior = (char *)malloc(size + 1);
+        strncpy(ambito_anterior, ambito, size);
+        ambito_anterior[size] = '\0';
+        string key = id_to_check + string(ambito_anterior);
+        if (tabla_simbolos.find(key) != tabla_simbolos.end())
+        {
+            return;
+        }
+        ambito = ambito_anterior;
+    }
+    key = id_to_check + string(ambito);
+    if (tabla_simbolos.find(key) == tabla_simbolos.end())
+    {
+        string id_key_string = id_to_check;
+        string error = "El identificador " + id_key_string + " no ha sido declarado en el ambito actual";
+        yyerror(error.c_str());
+        return;
+    }
+}
 %}
 
 %union YYSTYPE {
@@ -194,6 +226,8 @@ procedureidentifier: tk_read
     | tk_assign
     | tk_close
     | tk_reset
+    | tk_inc
+    | tk_dec
     ;
 
 typeidentifier: type
@@ -259,7 +293,7 @@ variabledeclarations: variabledeclaration
 ;
 
 variabledeclaration: identifierlist ':' type ';' {resolve_pending_identifiers();}
-    | identifierlist ':' identifier ';' {resolve_pending_identifiers();}
+    | identifierlist ':' identifier ';' {resolve_pending_identifiers(); check_identifier_exists($3);}
     ;
 
 
@@ -303,8 +337,8 @@ optionalstatementpart: statementpart
   |
 ;
 
-typedeclaration: identifier '=' type ';' {insertar_simbolo($1, return_char_from_string("type"), linea);}
-    | identifier '=' identifier ';' {insertar_simbolo($1, return_char_from_string("type"), linea);}
+typedeclaration: identifier '=' type ';' {insertar_simbolo($1, return_char_from_string("TYPE"), linea);}
+    | identifier '=' identifier ';' {insertar_simbolo($1, return_char_from_string("TYPE"), linea);}
     ;
 ;
 
@@ -341,8 +375,11 @@ sizeattribute: unsignedinteger
 enumeratedtype: '(' identifierlist ')'
     ;
 
-subrangetype: constant range_op constant
-  | identifier range_op identifier
+subrangetype: constant range_op constant {current_tipo = return_char_from_string("SUBRANGE");}
+    | constant range_op identifier {current_tipo = return_char_from_string("SUBRANGE"); check_identifier_exists($3);}
+    | identifier range_op constant {current_tipo = return_char_from_string("SUBRANGE"); check_identifier_exists($1);} 
+    | identifier range_op identifier {current_tipo = return_char_from_string("SUBRANGE"); check_identifier_exists($1); check_identifier_exists($3);}
+    ;
 ;
 
 structuredtype: arraytype {current_tipo = return_char_from_string("ARRAY");}
@@ -356,9 +393,9 @@ structuredtype: arraytype {current_tipo = return_char_from_string("ARRAY");}
     ;
 
 arraytype: tk_array '[' indextypes ']' tk_of type {current_tipo = return_char_from_string("ARRAY"); update_tipo();}
-    | tk_array '[' indextypes ']' tk_of identifier {current_tipo = return_char_from_string("ARRAY"); update_tipo();}
+    | tk_array '[' indextypes ']' tk_of identifier {current_tipo = $6; update_tipo(); check_identifier_exists($6);}
     | tk_array '[' ranges ']' tk_of type {current_tipo = return_char_from_string("ARRAY"); update_tipo();}
-    | tk_array '[' ranges ']' tk_of identifier {current_tipo = return_char_from_string("ARRAY"); update_tipo();}
+    | tk_array '[' ranges ']' tk_of identifier {current_tipo = $6; update_tipo(); check_identifier_exists($6);}
     ;
 
 ranges: subrangetype
@@ -392,11 +429,11 @@ fielddeclarations: fielddeclaration
     ;
 
 fielddeclaration: identifierlist ':' type
-    | identifierlist ':' identifier
+    | identifierlist ':' identifier {check_identifier_exists($3);}
     ;
 
 variantpart: tk_case tagfieldtype tk_of variants
-    | tk_case identifier ':' tagfieldtype tk_of variants
+    | tk_case identifier ':' tagfieldtype tk_of variants 
     ;
 
 variants: variant
@@ -422,7 +459,7 @@ settype: tk_set tk_of ordinaltype
 
 filetype: tk_file
     | tk_file tk_of type
-    | tk_file tk_of identifier
+    | tk_file tk_of identifier {check_identifier_exists($3);}
     ;
 
 pointertype: '^' basetype {current_tipo = return_char_from_string("POINTER");}
@@ -431,7 +468,7 @@ pointertype: '^' basetype {current_tipo = return_char_from_string("POINTER");}
 basetype: typeidentifier
     ;
 
-variablereference: identifier qualifiers
+variablereference: identifier qualifiers {check_identifier_exists($1);}
     ;
 
 qualifiers : qualifier
@@ -454,7 +491,7 @@ fielddesignator: '.' identifier
     ;
 
 factor: '@' variablereference
-    | '@' identifier
+    | '@' identifier {check_identifier_exists($2);}
     | unsignedconstant
     | functioncall
     | setconstructor
@@ -473,11 +510,11 @@ term: factor
     | factor tk_div term
     | factor tk_mod term
     | factor tk_and term
-    | identifier '*' term
-    | identifier '/' term
-    | identifier tk_div term
-    | identifier tk_mod term
-    | identifier tk_and term
+    | identifier '*' term {check_identifier_exists($1);}
+    | identifier '/' term {check_identifier_exists($1);}
+    | identifier tk_div term {check_identifier_exists($1);}
+    | identifier tk_mod term {check_identifier_exists($1);}
+    | identifier tk_and term  {check_identifier_exists($1);}
     | quotedstringconstant '*' term
     | quotedstringconstant '/' term
     | quotedstringconstant tk_div term
@@ -488,7 +525,7 @@ term: factor
     | variablereference tk_div term
     | variablereference tk_mod term
     | variablereference tk_and term
-    | identifier
+    | identifier {check_identifier_exists($1);}
     | quotedstringconstant
     | quotedcharacterconstant
     ;
@@ -500,8 +537,8 @@ simpleexpression: unsignedexpression
 unsignedexpression: term sign unsignedexpression
     | term tk_or unsignedexpression
     | term
-    | identifier sign unsignedexpression
-    | identifier tk_or unsignedexpression
+    | identifier sign unsignedexpression {check_identifier_exists($1);}
+    | identifier tk_or unsignedexpression {check_identifier_exists($1);}
     ;
 
 expression: simpleexpression comparison_op simpleexpression
@@ -512,7 +549,7 @@ expression: simpleexpression comparison_op simpleexpression
     | simpleexpression
     ; 
 
-functioncall: identifier actualparameterlist;
+functioncall: identifier actualparameterlist {check_identifier_exists($1);} 
 
 actualparameterlist: '(' actualparametergroup ')'
     ;
@@ -552,14 +589,14 @@ simplestatement: assignmentstatement
     ;
 
 assignmentstatement: variablereference assignment_op expression
-    | identifier assignment_op expression
-    | identifier assignment_op tk_false
-    | identifier assignment_op tk_true
+    | identifier assignment_op expression {check_identifier_exists($1);}
+    | identifier assignment_op tk_false {check_identifier_exists($1);}
+    | identifier assignment_op tk_true {check_identifier_exists($1);}
     ;
 
 procedurestatement: procedureidentifier
     | procedureidentifier actualparameterlist
-    | identifier actualparameterlist
+    | identifier actualparameterlist {check_identifier_exists($1);}
     ;
 
 gotostatement: tk_goto label
@@ -614,10 +651,10 @@ repeatstatement: tk_repeat statements tk_until expression
 whilestatement: tk_while expression tk_do statement
     ;
 
-forstatement: tk_for identifier assignment_op initialvalue tk_to finalvalue tk_do statements
-    | tk_for identifier assignment_op initialvalue tk_downto finalvalue tk_do statements
-    | tk_for identifier assignment_op initialvalue tk_to identifier tk_do statements
-    | tk_for identifier assignment_op initialvalue tk_downto identifier tk_do statements
+forstatement: tk_for identifier assignment_op initialvalue tk_to finalvalue tk_do statements {check_identifier_exists($2);}
+    | tk_for identifier assignment_op initialvalue tk_downto finalvalue tk_do statements {check_identifier_exists($2);}
+    | tk_for identifier assignment_op initialvalue tk_to identifier tk_do statements {check_identifier_exists($2); check_identifier_exists($6);}
+    | tk_for identifier assignment_op initialvalue tk_downto identifier tk_do statements {check_identifier_exists($2); check_identifier_exists($6);}
     ;
 
 initialvalue: expression
@@ -667,7 +704,7 @@ functionheading: tk_function identifier optionalformalparameterlist ':' resultty
 
 resulttype: ordinaltypeidentifier 
   | realtypeidentifier 
-  | identifier
+  | identifier {check_identifier_exists($1);}
 ;
 
 formalparameter: parameterdeclaration 
