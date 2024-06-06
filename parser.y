@@ -1,10 +1,10 @@
-%token identifier 
+%token <cadena> identifier 
 %token quotedstringconstant
 %token unsignedinteger
 %token quotedcharacterconstant
 %token digitsequence 
 %token unsignednumber 
-%token ordinaltypereservedwords
+%token <cadena> ordinaltypereservedwords
 %token tk_program
 %token tk_begin
 %token tk_uses
@@ -66,20 +66,104 @@
 
 %{
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <string>
+#include <unordered_map> 
+#include <vector> 
 #pragma warning(disable: 4996 6385 6011 4267 4244 4013 4312 4005 6387 26451)
 
 extern FILE *yyin;
 extern int yylex(void);
 extern int linea;
 int yyerror(const char *s);
+using namespace std;
+
+struct identificador
+{
+    string id;
+    char *ambito;
+    int linea_definicion;
+    char *tipo;
+    vector <int> lineas;
+};
+
+unordered_map<string, identificador> tabla_simbolos;
+char *current_ambito;
+char *current_tipo;
+vector<int> current_identifiers;
+vector<identificador> pending_identifiers;
+
+void insertar_simbolo(char *id_key, char *tipo, int linea){
+    string key = id_key + string(current_ambito); 
+    if (tabla_simbolos.find(key) != tabla_simbolos.end())
+    {
+        string id_key_string = id_key;
+        string error = "El identificador " + id_key_string + " ya ha sido declarado en el mismo ambito";
+        yyerror(error.c_str());
+        return;
+    }
+
+    struct identificador id;
+    id.ambito = current_ambito;
+    id.linea_definicion = linea;
+    id.tipo = tipo;
+    id.id = id_key;
+    tabla_simbolos[key] = id;
+}
+
+void resolve_pending_identifiers(){
+    for (int i = 0; i < pending_identifiers.size(); i++)
+    {
+        string key = pending_identifiers[i].id + current_ambito;
+        identificador id = pending_identifiers[i];
+        id.ambito = current_ambito;
+        if (tabla_simbolos.find(key) != tabla_simbolos.end())
+        {
+            string id_key_string = pending_identifiers[i].id;
+            string error = "El identificador " + id_key_string + " ya ha sido declarado en el mismo ambito";
+            yyerror(error.c_str());
+            return;
+        }
+        tabla_simbolos[key] = id;
+    }
+    pending_identifiers.clear();
+}
+
+void update_tipo(){
+    for (int i = 0; i < current_identifiers.size(); i++)
+    {
+        pending_identifiers[current_identifiers[i]].tipo = current_tipo;
+    }
+    current_identifiers.clear();
+}
+
+char * concatenar_ambito(char *nuevo_ambito)
+{
+    char *ambito = (char *)malloc(strlen(current_ambito) + strlen(nuevo_ambito) + 2);
+    strcpy(ambito, current_ambito);
+    strcat(ambito, ".");
+    strcat(ambito, nuevo_ambito);
+    return ambito;
+}
+
+void quitar_ambito_anterior(){
+    if(strchr(current_ambito, '.') == NULL){
+        return;
+    }
+    char *p = strrchr(current_ambito, '.');
+    int size = p - current_ambito;
+    char *ambito = (char *)malloc(size + 1);
+    strncpy(ambito, current_ambito, size);
+    ambito[size] = '\0';
+    current_ambito = ambito;
+}
 %}
 
 %union YYSTYPE {
     char *cadena;
     int numero;
 }
+
+%output = "parser.tab.cpp"
 
 %left '=' comparison_op '<' '>' tk_in
 %left '+' '-' tk_or
@@ -110,18 +194,18 @@ typeidentifier: type
 ;
 
 
-constantdeclaration: identifier '=' constant ';'
-    | identifier '=' identifier ';'
+constantdeclaration: identifier '=' constant ';' {insertar_simbolo($1, current_tipo, linea);}
+    | identifier '=' identifier ';' {insertar_simbolo($1, current_tipo, linea);}
     ;
 
-constant: '+' identifier
-    | '-' identifier
-    | sign unsignednumber
-    | sign unsignedinteger
-    | sign digitsequence
-    | quotedstringconstant
-    | quotedcharacterconstant
-    | digitsequence
+constant: '+' identifier {current_tipo = "LONGINT"}
+    | '-' identifier {current_tipo = "LONGINT"}
+    | sign unsignednumber {current_tipo = "LONGINT"}
+    | sign unsignedinteger {current_tipo = "LONGINT"}
+    | sign digitsequence {current_tipo = "INTEGER"}
+    | quotedstringconstant {current_tipo = "WORD"}
+    | quotedcharacterconstant {current_tipo = "CHAR"}
+    | digitsequence {current_tipo = "INTEGER"}
     ;
 
 block: optionallabeldeclarationpart optionalconstantdeclarationpart optionaltypedeclarationpart optionalvariabledeclarationpart optionalprocedureandfunctiondeclarationpart optionalstatementpart
@@ -161,11 +245,34 @@ optionaltypedeclarationpart: typedeclarationpart
 ;
 
 variabledeclarationpart: tk_var variabledeclarations
+    ;
 ;
 
 variabledeclarations: variabledeclaration
     | variabledeclaration variabledeclarations
 ;
+
+variabledeclaration: identifierlist ':' type ';' {resolve_pending_identifiers();}
+    | identifierlist ':' identifier ';' {resolve_pending_identifiers();}
+    ;
+
+
+identifierlist:
+    identifier {
+            identificador temp;
+            temp.id = $1;
+            temp.linea_definicion = linea;
+            pending_identifiers.push_back(temp);
+            current_identifiers.push_back(pending_identifiers.size() - 1);
+    }
+    | identifier ',' identifierlist {
+        identificador temp;
+        temp.id = $1;
+        temp.linea_definicion = linea;
+        pending_identifiers.push_back(temp);
+        current_identifiers.push_back(pending_identifiers.size() - 1);
+    }
+    ;
 
 optionalvariabledeclarationpart: variabledeclarationpart
   |
@@ -190,8 +297,9 @@ optionalstatementpart: statementpart
   |
 ;
 
-typedeclaration: identifier '=' type ';'
-  | identifier '=' identifier ';'
+typedeclaration: identifier '=' type ';' {insertar_simbolo($1, "type", linea);}
+    | identifier '=' identifier ';' {insertar_simbolo($1, "type", linea);}
+    ;
 ;
 
 type: simpletype
@@ -207,10 +315,10 @@ simpletype: ordinaltype
 realtype: realtypeidentifier
     ;
 
-realtypeidentifier: tk_real
+realtypeidentifier: tk_real {current_tipo = "REAL";}
 ;
 
-ordinaltypeidentifier: ordinaltypereservedwords
+ordinaltypeidentifier: ordinaltypereservedwords {current_tipo = $1;update_tipo();}
 ;
 
 ordinaltype: subrangetype
@@ -231,28 +339,25 @@ subrangetype: constant range_op constant
   | identifier range_op identifier
 ;
 
-structuredtype: arraytype
-    | settype
-    | filetype
-    | recordtype
+structuredtype: arraytype {current_tipo = "ARRAY";}
+    | settype {current_tipo = "SET";}
+    | filetype {current_tipo = "FILE";}
+    | recordtype {current_tipo = "RECORD";}
     | tk_packed arraytype
     | tk_packed settype
     | tk_packed filetype
     | tk_packed recordtype
     ;
 
-arraytype: tk_array '[' indextypes ']' tk_of type
-    | tk_array '[' indextypes ']' tk_of identifier
-    | tk_array '[' ranges ']' tk_of type
-    | tk_array '[' ranges ']' tk_of identifier
+arraytype: tk_array '[' indextypes ']' tk_of type {current_tipo = "ARRAY"; update_tipo();}
+    | tk_array '[' indextypes ']' tk_of identifier {current_tipo = "ARRAY"; update_tipo();}
+    | tk_array '[' ranges ']' tk_of type {current_tipo = "ARRAY"; update_tipo();}
+    | tk_array '[' ranges ']' tk_of identifier {current_tipo = "ARRAY"; update_tipo();}
     ;
 
 ranges: subrangetype
     | subrangetype ',' ranges
     ;
-    
-
-
 
 indextypes: indextype
     | indextype ',' indextypes
@@ -314,22 +419,13 @@ filetype: tk_file
     | tk_file tk_of identifier
     ;
 
-pointertype: '^' basetype
+pointertype: '^' basetype {current_tipo = "POINTER";}
     ;
 
 basetype: typeidentifier
     ;
 
-variabledeclaration: identifierlist ':' type ';'
-    | identifierlist ':' identifier ';'
-    ;
-
 variablereference: identifier qualifiers
-    ;
-
-identifierlist:
-    identifier
-    | identifier ',' identifierlist
     ;
 
 qualifiers : qualifier
@@ -441,7 +537,7 @@ statement: label range_op simplestatement
     | label range_op
     | simplestatement
     | structuredstatement
-    |
+    | 
     ;
 
 simplestatement: assignmentstatement
@@ -544,7 +640,7 @@ procedurebody: block
   | tk_external
 ;
 
-procedureheading: tk_procedure identifier optionalformalparameterlist
+procedureheading: tk_procedure identifier optionalformalparameterlist {quitar_ambito_anterior(); insertar_simbolo($2, "PROCEDURE", linea); current_ambito = concatenar_ambito($2); resolve_pending_identifiers();}
 ;
 
 optionalformalparameterlist: formalparameterlist
@@ -560,7 +656,7 @@ functionbody: block
   | tk_external
 ;
 
-functionheading: tk_function identifier optionalformalparameterlist ':' resulttype 
+functionheading: tk_function identifier optionalformalparameterlist ':' resulttype {quitar_ambito_anterior(); insertar_simbolo($2, "FUNCTION", linea); current_ambito = concatenar_ambito($2);}
 ;
 
 resulttype: ordinaltypeidentifier 
@@ -568,7 +664,7 @@ resulttype: ordinaltypeidentifier
   | identifier
 ;
 
-formalparameter: parameterdeclaration
+formalparameter: parameterdeclaration 
   | procedureheading
   | functionheading
 ;
@@ -588,7 +684,7 @@ optionalprogramuseclause: usesclause ';'
   |
 ;
 
-programheading: tk_program identifier optionalprogramheadingparameters
+programheading: tk_program identifier optionalprogramheadingparameters { current_ambito=$2; insertar_simbolo($2, "PROGRAM", linea);}
 ;
 
 optionalprogramheadingparameters: '(' programparameters ')' 
@@ -661,5 +757,22 @@ int main(int argc, char* argv[]) {
     }
 
     yyparse();
+
+    printf("Tabla de simbolos\n");
+    printf("Identificador |\tAmbito |\tLinea de definicion |\tTipo |\tLineas de uso\n");
+    
+    for (auto it = tabla_simbolos.begin(); it != tabla_simbolos.end(); ++it)
+    {
+        printf("%s\t", it->second.id.c_str());
+        printf("%s\t", it->second.ambito);
+        printf("%d\t", it->second.linea_definicion);
+        printf("%s\t", it->second.tipo);
+        for (int i = 0; i < it->second.lineas.size(); i++)
+        {
+            printf("%d,", it->second.lineas[i]);
+        }
+        printf("\n");
+    }
+
 	return 0;
 }

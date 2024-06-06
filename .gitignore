@@ -6,6 +6,9 @@ parser.tab.c
 parser.tab.h
 scanner.cpp
 scanner.cpp
+parser.tab.cpp
+parser.tab.hpp
+lex.yy.cpp
 *.pas
 
 a.out

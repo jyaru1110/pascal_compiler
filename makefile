@@ -1,5 +1,5 @@
 compila_pascal: main.l parser.y
-	flex -L main.l
+	flex -L -o lex.yy.cpp main.l
 	bison -dtv parser.y
-	gcc parser.tab.c lex.yy.c
-	./a.out "Pr_1.pas"
+	g++ -std=c++17 parser.tab.cpp lex.yy.cpp
+	./a.out "test_begin_end.pas"

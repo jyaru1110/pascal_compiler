@@ -1,6 +1,6 @@
 %{ 
 #include <stdio.h>
-#include "parser.tab.h"
+#include "parser.tab.hpp"
 extern int yyerror(const char *s);
 #pragma warning(disable: 4996 6385 6011 4267 4244 4013 4312 4005 6387 26451)
 int linea=1;
@@ -34,7 +34,6 @@ LINEA [\n]
 
 %option noyywrap
 %option case-insensitive
-
 %%
 
 {SINGLESTRINGCHARACTER} {
@@ -51,6 +50,7 @@ LINEA [\n]
 
 
 {ORDINAL_TYPE_IDENTIFIER} {
+	yylval.cadena = strdup(yytext);
 	return ordinaltypereservedwords;
 }
 
@@ -95,8 +95,12 @@ LINEA [\n]
 "var" { return tk_var; }
 "forward" { return tk_forward; }
 "external" { return tk_external; }
-"function" { return tk_function; }
-"procedure" { return tk_procedure; }
+"function" { 
+	return tk_function; 
+}
+"procedure" { 
+	return tk_procedure; 
+}
 "file" { return tk_file; }
 "goto" { return tk_goto; }
 "if" { return tk_if; }
@@ -126,6 +130,7 @@ LINEA [\n]
 "not" { return tk_not; }
 
 {IDENTIFICADOR} {
+	yylval.cadena = strdup(yytext);
 	return identifier;
 }
 
