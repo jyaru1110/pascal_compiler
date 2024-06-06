@@ -169,6 +169,7 @@ void check_identifier_exists(char *id_to_check){
     string key = id_to_check + string(current_ambito);
     if (tabla_simbolos.find(key) != tabla_simbolos.end())
     {
+        tabla_simbolos[key].lineas.push_back(linea);
         return;
     }
     char *ambito = current_ambito;
@@ -181,6 +182,7 @@ void check_identifier_exists(char *id_to_check){
         string key = id_to_check + string(ambito_anterior);
         if (tabla_simbolos.find(key) != tabla_simbolos.end())
         {
+            tabla_simbolos[key].lineas.push_back(linea);
             return;
         }
         ambito = ambito_anterior;
