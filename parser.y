@@ -145,6 +145,12 @@ char * concatenar_ambito(char *nuevo_ambito)
     return ambito;
 }
 
+char * return_char_from_string(string str){
+    char *cstr = new char[str.length() + 1];
+    strcpy(cstr, str.c_str());
+    return cstr;
+}
+
 void quitar_ambito_anterior(){
     if(strchr(current_ambito, '.') == NULL){
         return;
@@ -198,14 +204,14 @@ constantdeclaration: identifier '=' constant ';' {insertar_simbolo($1, current_t
     | identifier '=' identifier ';' {insertar_simbolo($1, current_tipo, linea);}
     ;
 
-constant: '+' identifier {current_tipo = "LONGINT"}
-    | '-' identifier {current_tipo = "LONGINT"}
-    | sign unsignednumber {current_tipo = "LONGINT"}
-    | sign unsignedinteger {current_tipo = "LONGINT"}
-    | sign digitsequence {current_tipo = "INTEGER"}
-    | quotedstringconstant {current_tipo = "WORD"}
-    | quotedcharacterconstant {current_tipo = "CHAR"}
-    | digitsequence {current_tipo = "INTEGER"}
+constant: '+' identifier {current_tipo =return_char_from_string("LONGINT")}
+    | '-' identifier {current_tipo = return_char_from_string("LONGINT")}
+    | sign unsignednumber {current_tipo = return_char_from_string("LONGINT")}
+    | sign unsignedinteger {current_tipo = return_char_from_string("LONGINT")}
+    | sign digitsequence {current_tipo =return_char_from_string("INTEGER")}
+    | quotedstringconstant {current_tipo = return_char_from_string("WORD")}
+    | quotedcharacterconstant {current_tipo = return_char_from_string("CHAR")}
+    | digitsequence {current_tipo = return_char_from_string("INTEGER")}
     ;
 
 block: optionallabeldeclarationpart optionalconstantdeclarationpart optionaltypedeclarationpart optionalvariabledeclarationpart optionalprocedureandfunctiondeclarationpart optionalstatementpart
@@ -297,8 +303,8 @@ optionalstatementpart: statementpart
   |
 ;
 
-typedeclaration: identifier '=' type ';' {insertar_simbolo($1, "type", linea);}
-    | identifier '=' identifier ';' {insertar_simbolo($1, "type", linea);}
+typedeclaration: identifier '=' type ';' {insertar_simbolo($1, return_char_from_string("type"), linea);}
+    | identifier '=' identifier ';' {insertar_simbolo($1, return_char_from_string("type"), linea);}
     ;
 ;
 
@@ -315,7 +321,7 @@ simpletype: ordinaltype
 realtype: realtypeidentifier
     ;
 
-realtypeidentifier: tk_real {current_tipo = "REAL";}
+realtypeidentifier: tk_real {current_tipo = return_char_from_string("REAL");}
 ;
 
 ordinaltypeidentifier: ordinaltypereservedwords {current_tipo = $1;update_tipo();}
@@ -339,20 +345,20 @@ subrangetype: constant range_op constant
   | identifier range_op identifier
 ;
 
-structuredtype: arraytype {current_tipo = "ARRAY";}
-    | settype {current_tipo = "SET";}
-    | filetype {current_tipo = "FILE";}
-    | recordtype {current_tipo = "RECORD";}
+structuredtype: arraytype {current_tipo = return_char_from_string("ARRAY");}
+    | settype {current_tipo = return_char_from_string("SET");}
+    | filetype {current_tipo = return_char_from_string("FILE");}
+    | recordtype {current_tipo = return_char_from_string("RECORD");}
     | tk_packed arraytype
     | tk_packed settype
     | tk_packed filetype
     | tk_packed recordtype
     ;
 
-arraytype: tk_array '[' indextypes ']' tk_of type {current_tipo = "ARRAY"; update_tipo();}
-    | tk_array '[' indextypes ']' tk_of identifier {current_tipo = "ARRAY"; update_tipo();}
-    | tk_array '[' ranges ']' tk_of type {current_tipo = "ARRAY"; update_tipo();}
-    | tk_array '[' ranges ']' tk_of identifier {current_tipo = "ARRAY"; update_tipo();}
+arraytype: tk_array '[' indextypes ']' tk_of type {current_tipo = return_char_from_string("ARRAY"); update_tipo();}
+    | tk_array '[' indextypes ']' tk_of identifier {current_tipo = return_char_from_string("ARRAY"); update_tipo();}
+    | tk_array '[' ranges ']' tk_of type {current_tipo = return_char_from_string("ARRAY"); update_tipo();}
+    | tk_array '[' ranges ']' tk_of identifier {current_tipo = return_char_from_string("ARRAY"); update_tipo();}
     ;
 
 ranges: subrangetype
@@ -419,7 +425,7 @@ filetype: tk_file
     | tk_file tk_of identifier
     ;
 
-pointertype: '^' basetype {current_tipo = "POINTER";}
+pointertype: '^' basetype {current_tipo = return_char_from_string("POINTER");}
     ;
 
 basetype: typeidentifier
@@ -640,7 +646,7 @@ procedurebody: block
   | tk_external
 ;
 
-procedureheading: tk_procedure identifier optionalformalparameterlist {quitar_ambito_anterior(); insertar_simbolo($2, "PROCEDURE", linea); current_ambito = concatenar_ambito($2); resolve_pending_identifiers();}
+procedureheading: tk_procedure identifier optionalformalparameterlist {quitar_ambito_anterior(); insertar_simbolo($2,return_char_from_string("PROCEDURE"), linea); current_ambito = concatenar_ambito($2); resolve_pending_identifiers();}
 ;
 
 optionalformalparameterlist: formalparameterlist
@@ -656,7 +662,7 @@ functionbody: block
   | tk_external
 ;
 
-functionheading: tk_function identifier optionalformalparameterlist ':' resulttype {quitar_ambito_anterior(); insertar_simbolo($2, "FUNCTION", linea); current_ambito = concatenar_ambito($2);}
+functionheading: tk_function identifier optionalformalparameterlist ':' resulttype {quitar_ambito_anterior(); insertar_simbolo($2, return_char_from_string("FUNCTION"), linea); current_ambito = concatenar_ambito($2);}
 ;
 
 resulttype: ordinaltypeidentifier 
@@ -684,7 +690,7 @@ optionalprogramuseclause: usesclause ';'
   |
 ;
 
-programheading: tk_program identifier optionalprogramheadingparameters { current_ambito=$2; insertar_simbolo($2, "PROGRAM", linea);}
+programheading: tk_program identifier optionalprogramheadingparameters { current_ambito=$2; insertar_simbolo($2, return_char_from_string("PROGRAM"), linea);}
 ;
 
 optionalprogramheadingparameters: '(' programparameters ')' 
