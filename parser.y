@@ -69,6 +69,7 @@
 %{
 #include <stdio.h>
 #include <string>
+#include <cstring>
 #include <unordered_map> 
 #include <vector> 
 #pragma warning(disable: 4996 6385 6011 4267 4244 4013 4312 4005 6387 26451)
@@ -804,18 +805,25 @@ int main(int argc, char* argv[]) {
     yyparse();
 
     printf("Tabla de simbolos\n");
-    printf("Identificador |\tAmbito |\tLinea de definicion |\tTipo |\tLineas de uso\n");
-    
+    printf("------------------------------------------------------------------------------------------------------------------------\n");
+    printf("%21s ", " Identificador |");
+    printf("%25s", " Ambito |");
+    printf("%7s" , "Linea de definicion |");
+    printf("%21s" , " Tipo |");
+    printf("%19s" , " Lineas de uso\n");
+    printf("------------------------------------------------------------------------------------------------------------------------\n");
+
     for (auto it = tabla_simbolos.begin(); it != tabla_simbolos.end(); ++it)
     {
-        printf("%s\t", it->second.id.c_str());
-        printf("%s\t", it->second.ambito);
-        printf("%d\t", it->second.linea_definicion);
-        printf("%s\t", it->second.tipo);
+        printf("%19s |", it->second.id.c_str());
+        printf("%24s |", it->second.ambito);
+        printf("%19d |", it->second.linea_definicion);
+        printf("%19s |", it->second.tipo);
         for (int i = 0; i < it->second.lineas.size(); i++)
         {
             printf("%d,", it->second.lineas[i]);
         }
+	
         printf("\n");
     }
 
